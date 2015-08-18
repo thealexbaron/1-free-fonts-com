@@ -1,0 +1,57 @@
+#------------------------------------------------------------------------
+# sample .ttreerc file created automatically by ttree version 2.9
+#
+# This file originally written to /home/gquotes/.ttreerc
+#
+# For more information on the contents of this configuration file, see
+# 
+#     perldoc ttree
+#     ttree -h
+#
+#------------------------------------------------------------------------
+
+# The most flexible way to use ttree is to create a separate directory 
+# for configuration files and simply use the .ttreerc to tell ttree where
+# it is.  
+#
+#     cfg = /path/to/ttree/config/directory
+
+# print summary of what's going on 
+verbose 
+
+# recurse into any sub-directories and process files
+recurse
+
+# regexen of things that aren't templates and should be ignored
+ignore = \b(CVS|RCS)\b
+ignore = \.svn
+ignore = ^#
+ignore = ~$
+
+# ditto for things that should be copied rather than processed.
+copy = \.png$ 
+copy = \.gif$ 
+
+# by default, everything not ignored or copied is accepted; add 'accept'
+# lines if you want to filter further. e.g.
+#
+#    accept = \.html$
+#    accept = \.tt2$
+
+suffix htm.tt=htm
+suffix html.tt=html
+suffix js.tt=js
+
+relative = 1
+
+# directory containing source page templates
+src = ../../src
+
+# directory where output files should be written
+dest = ../../root
+
+# additional directories of library templates
+lib = ../../include
+
+depend_file = gen-static-pages.depends
+

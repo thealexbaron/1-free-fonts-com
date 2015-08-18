@@ -1,0 +1,11 @@
+#table-container {
+    width: 100%;
+    margin: 0px auto !important;
+}
+table {
+    border-collapse: collapse;
+}
+table, th, td {
+    border: 1px solid black;
+}
+

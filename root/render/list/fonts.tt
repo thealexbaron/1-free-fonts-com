@@ -1,0 +1,61 @@
+[% WRAPPER wrapper.tt %]
+[%- title = BLOCK %]
+Font &raquo; [% type %] &raquo; [% letter %] &raquo; Page [% pgr.current_page %]  | [% c.config.tag_line.fonts.generic %]
+[% END %]
+
+[%- meta_description = BLOCK %]
+Font &raquo; [% type %] &raquo; [% letter %] &raquo; Page [% pgr.current_page %] | [% c.config.tag_line.fonts.generic %]
+[% END %]
+
+<style type="text/css">
+	#AlphabetTable td {
+		padding-right:60px;
+	}
+	.count {
+		color:gray;
+		font-size:11px;
+	}
+</style>
+
+<h1>Font &raquo; [% type %] &raquo; [% letter %] [% UNLESS pgr.current_page == 1 %]&raquo; Page [% pgr.current_page %][% END %]</h1>
+
+[% FOREACH alpha_letter IN letters %]
+    [% UNLESS alpha_letter == requested_letter %]
+    <a href="[% alpha_links_base %]/[% alpha_letter %]">[% alpha_letter %]</a>
+    [% ELSE %]
+    [% alpha_letter %]
+    [% END %]
+    [% UNLESS loop.last %] | [% END %]
+[% END %]
+
+<br /><br />
+<div style="float:left;margin-right:12px;">
+    [% INCLUDE paging.tt %]
+</div>
+<div style="float:left;">
+    [% INCLUDE addthis.tt %]
+</div>
+<br /><br />
+
+[% IF names %]
+    [% USE table(names, rows=3, cols=display_rows, pad=2) %]
+    <table id="AlphabetTable">
+    [% FOREACH column = table.cols %]
+       <tr>
+       [% FOREACH item = column %]
+       <td>
+           <div>
+           <a href="[% alpha_links_base %]/[% item.url_firstname %][% item.url_lastname %]">
+               [% IF item.image %]<div style="float:left;margin-right:5px;"><img src="/static/images/authors/[% item.id %]-small.jpg" alt="[% item.last_name %][% IF item.first_name %], [% item.first_name %][% END %]" /></div>[% END %]
+               <div>[% item.last_name %][% IF item.first_name %], [% item.first_name %][% END %]</a> <span class="count">[% item.count %]</span></div>
+           </div>
+       </td>
+       [% END %]
+       </tr>
+    [% END %]
+    </table>
+[% ELSE %]
+    <p>No entries found for category [% letter %]</p>
+[% END %]
+
+[% END %]

@@ -1,0 +1,19 @@
+[% IF pgr.total_entries > pgr.entries_per_page %]
+<div class="pagination pagination-small">
+	<ul>
+[% IF (pgr.current_page - 1) == 1 %]<li><a href="/[% pgr.urlbase %]">&laquo;</a></li>
+[% ELSIF pgr.current_page > 1 %]<li><a href="/[% pgr.urlbase %]/pg/[% pgr.current_page - 1 %]">&laquo;</a></li>
+[% ELSE %]<li><a href="#null">&laquo;</a></li>[% END %]
+
+[% FOREACH thispage = [pgr.lowest_page..pgr.highest_page] -%]
+	[% IF thispage == pgr.current_page %]
+		<li><a href="#null"><b>[% thispage %]</b></a></li>
+	[% ELSIF thispage == 1 %]
+		<li><a href="/[% pgr.urlbase %]">[% thispage %]</a></li>
+	[% ELSE %]<li><a href="/[% pgr.urlbase %]/pg/[% thispage %]">[% thispage %]</a></li>
+	[% END %]
+[% END %]
+[% IF pgr.current_page < pgr.highest_page %]<li><a href="/[% pgr.urlbase %]/pg/[% pgr.current_page + 1 %]">&raquo;</a></li>[% ELSE %]&raquo;[% END %]
+	</ul>
+</div>
+[% END %]

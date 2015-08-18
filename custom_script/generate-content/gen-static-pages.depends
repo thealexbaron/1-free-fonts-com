@@ -1,0 +1,12 @@
+# If any of the files listed here are modified it should force ttree
+# to update ALL files generated from templates in the "src" directory
+# specified in the ttree rc file in this directory.
+
+* : \
+doctype.tt  \
+footer.tt  \
+header2.tt  \
+header.tt  \
+navigation.tt  \
+wrapper.tt  \
+user_nav.tt

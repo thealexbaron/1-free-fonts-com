@@ -1,0 +1,67 @@
+#!/opt/perl/bin/perl
+
+use strict;
+use warnings;
+
+use Archive::Zip qw( :ERROR_CODES );
+use Data::Dumper;
+
+exit(main());
+
+sub main {
+
+return;
+
+    my $dir = '/home/alex/Harvest/root/static/fonts';
+    opendir(DIR, $dir) or die $!;
+
+    my @folders;
+    while (my $folder = readdir(DIR)) {
+
+        next if ($folder =~ m/^\./); # ignore .svn and such.
+        push @folders, $folder;
+
+    }
+
+    closedir(DIR);
+
+    my $count = 0;
+    foreach my $folder (@folders) {
+
+        $count++;
+
+        opendir(DIR, "$dir/$folder") or die $!;
+
+        while (my $file = readdir(DIR)) {
+
+            next if ($file =~ m/^\./);
+
+            if($file =~ m{\.zip$}) {
+
+                my $somezip = Archive::Zip->new();
+                unless ( $somezip->read( "$dir/$folder/$file" ) == AZ_OK ) {
+                    die 'read error';
+                }
+
+                #warn $somezip->zipfileComment();
+
+                $somezip->zipfileComment( 'Find thousands more free fonts at http://1-free-fonts.com!' );
+
+                #warn $somezip->zipfileComment();
+
+                unless ( $somezip->overwrite() == AZ_OK ) {
+                    die 'write error';
+                }
+            }
+
+            print "$file\n";
+
+        }
+
+        closedir(DIR);
+
+    }
+
+    print "$count changed.\n";
+
+}

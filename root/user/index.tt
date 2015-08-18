@@ -1,0 +1,226 @@
+[% WRAPPER wrapper.tt %]
+[%- title = BLOCK %]
+[% c.user.uid %]'s User Profile
+[% END %]
+
+<script type="text/javascript" src="/static/js/jquery.jeditable.js"></script>
+<script type="text/javascript" src="/static/js/jquery.jeditable.ajaxupload.js"></script>
+<script type="text/javascript" src="/static/js/jquery.ajaxfileupload.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function() {
+
+$('.edit').editable(function(value, settings) {
+
+	var return_val = $("textarea[name=value]").val();
+
+	$.ajax({
+  		url: "/user/add/userinfo",
+		type: "POST",
+		data: ({id : this.getAttribute('id'), value : $("textarea[name=value]").val()}),
+  		success: function(data){
+			return_val = data.content;
+  		}
+	});
+
+	return(return_val);
+
+  }, {
+     type    : 'textarea',
+     submit  : 'OK',
+ 	 tooltip   : 'Click to edit...',
+	 indicator : 'Saving...',
+     type: "textarea",
+	 height:65,
+});
+
+$(document).ready(function() {
+    var options = { 
+        //target:        '#output',   // target element(s) to be updated with server response 
+        success:       showResponse, 
+        dataType:  'json',
+        cache: false,
+        ifModified:true,
+    }; 
+ 
+    $('#uploadForm').submit(function() { 
+        $(this).ajaxSubmit(options); 
+        return false; 
+    }); 
+});
+
+
+function showResponse(json)  {
+
+    if(json['success'] == 'true') {
+        $(".user_image").html("");
+
+        // Keep this puppy away from the cache.
+        $(".user_image").image("/static/images/users/[% c.user.id %].jpg?" + Math.floor(Math.random()*115));
+    }
+    else if(json['error']) {
+        alert(json['error']);
+    }
+}
+
+$.fn.image = function(src, f){
+    return this.each(function(){ 
+        var i = new Image();
+        i.src = src;
+        i.onload = f;
+        this.appendChild(i);
+    });
+}
+
+});
+</script>
+
+<style type="text/css">
+
+.edit:hover {
+	text-decoration:underline;
+}
+
+.ajaxupload {
+
+	float:left;
+	padding-right:10px;
+
+}
+#loading {
+    display:none;
+}
+</style>
+
+
+[% IF c.flash.user_message %]<div class="success">[% c.flash.user_message %] <b>Give feedback <a href="/contact">here</a>.</b></div>[% END %]
+
+<form id="uploadForm" action="/user/upload" method="POST" enctype="multipart/form-data" encoding="multipart/form-data">
+    <input type="file" name="file">
+    <input type="submit" value="Submit">
+</form>
+
+<div class="user_image">
+[% IF c.user.image %]<img src="/static/images/users/[% c.user.id %].jpg" alt="[% c.user.firstname %] [% c.user.lastname %]" />
+[% ELSE %]
+<img src="/static/images/authors/user.jpg" alt="Upload an Image" /><br />Upload an image.
+[% END %]
+</div>
+
+<div id="loading">
+    Loading...
+</div>
+
+<h1>[% c.user.uid %]'s Quotes Profile</h1>
+
+<!-- <div>
+    <form action="/upload" method="post" enctype="multipart/form-data">
+      <input type="hidden" name="form_submit" value="yes">
+      <input type="file" name="my_file">
+      <input type="submit" value="Send">
+    </form>
+</div> -->
+
+[% c.user.firstname %] [% c.user.lastname %]<br />
+[% c.user.email %]<br />
+
+<!-- 
+<br />
+[% UNLESS c.user.facebook_id %]
+<a href="/user/facebook/authenticate">Connect your [% c.config.site_name %] Profile to Facebook!</a> 
+[% ELSE %]
+<i>Your Facebook is connected to [% c.config.site_name %].</i>
+[% END %]
+-->
+
+<hr class="space">
+
+<h2>About [% c.user.firstname %]</h2>
+<div class="edit" id="user_about">
+[%- UNLESS c.user.bio -%]
+[%- ELSE -%]
+[% c.user.bio %]
+[%- END -%]
+</div>
+
+<hr class="space">
+
+<hr>
+
+<h2><a href="/user/add/quote">Add a Quote</a> | <a href="/user/settings">Settings</a> | <a href="/contact">GIVE FEEDBACK</a></h2>
+
+<hr>
+
+<h2>[% c.user.uid %]'s Quotes</h2>
+<table>
+<tbody>
+<tr>
+    <th></th>
+    <th class="span-8">Quote</th>
+	<th class="span-3">Category</th>
+	<th class="span-3 last">Status</th>
+</tr>
+[% WHILE (item = rs.next) %]
+<tr>
+    <td><a href="[% c.uri_for('/user/delete/quote') %]/[% item.quote_id %]">X</a></td>
+	<td>[% item.quote %]</td>
+	<td>[% item.category_name %]</td>
+	<td>Approved!</td>
+</tr>
+[% END %]
+</tbody>
+</table>
+
+<hr>
+
+<script type="text/javascript">
+$(document).ready(function() {
+    $(".favorite_x").click(function () {
+
+		var current = this;
+
+		var button_id = this.id;
+		button_id = button_id.split('.');
+	
+		var vote = button_id[0];
+		var quote_id = button_id[1];
+		var cache_key = button_id[2];
+
+		$.get('/json/unfavorite' + '?quote_number=' + quote_id + '&cache_key=' + cache_key, function(data) {
+
+			console.log(data.rate_successful);
+
+			if(data.rate_successful) {
+				$(current).parent().parent().fadeOut('slow');
+			}
+			else {
+				alert('Error, please try again.');
+			}
+
+		});
+
+    });
+});
+</script>
+
+<h2>[% c.user.uid %]'s Favorites <img src="/static/images/favorite.png" alt="Favorites" style="background-position: 0px -18px; height:36px;" /></h2>
+<table>
+<tbody>
+<tr>
+    <th></th>
+    <th class="span-8">Quote</th>
+	<th class="span-3">Category</th>
+	<th>Author</th>
+</tr>
+[% WHILE (item = favorite_result.next) %]
+<tr>
+    <td><a href="#null" class="favorite_x" id="unfavorite.[% item.number %].">X</a></td>
+	<td>[% item.quote %]</td>
+	<td>[% item.category.name.join(', ') %]</td>
+	<td>[% item.author.first_name %] [% item.author.last_name %]</td>
+
+</tr>
+[% END %]
+</tbody>
+</table>
+[% END %]

@@ -1,0 +1,42 @@
+[% WRAPPER admin/test/wrapper.tt
+    title = 'Testing Home Page';
+    styles = [ '/static/css/admin/main_style.css' ];
+%]
+<div id="table-container">
+    <table border="1">
+        <tr>
+            <td colspan="2">
+                <strong>Developer Aids</strong>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <a href="/admin/test/showpaths">showpaths</a>
+            </td>
+            <td>
+                Display chained action path and endpoint action
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <strong>Unicode &lt;=&gt; Latin1 tests</strong>
+            </td>
+        <tr>
+            <td>
+                <a href="/admin/test/test_unicode_db_roundtrip">test_unicode_db_roundtrip</a>
+            </td>
+            <td>
+                <strong>Test:</strong> User input is submitted, inserted into the database, fetched from the database and displayed. Accented characters should be preserved.
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <a href="/admin/test/test_unicode_template">test_unicode_template</a>
+            </td>
+            <td>
+                <strong>Test:</strong> Verify that a template containing literal UTF-8 text is rendered correctly in the browser.
+            </td>
+        </tr>
+    </table>
+</div>
+[% END %]

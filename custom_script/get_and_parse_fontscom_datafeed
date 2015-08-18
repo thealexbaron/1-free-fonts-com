@@ -1,0 +1,139 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Parse::CSV;
+use Config::JFDI;
+use Data::Dumper;
+use Archive::Extract;
+
+use FindBin '$Bin';
+use lib "$FindBin::Bin/../lib";
+use Harvest::Schema;
+
+use LWP::Simple;
+
+exit(main());
+
+sub main {
+
+	my $my_config = Config::JFDI->new(name => "Harvest", path => "$Bin/..");
+	my $config = $my_config->get;
+
+	unless($config) {
+		warn "No config found.\n";
+	}
+
+	my $schema = Harvest::Schema->connect(
+		'dbi:mysql:database=fonts;host=localhost', 
+		'fonts', 
+		'cacaca1'
+	);
+
+	my $url = 'http://www.fonts.com/affiliate-feed/Fontscom.zip';
+	my $file = 'Fontscom.zip';
+
+	my $ae = Archive::Extract->new( archive => $file );
+
+	my $ok = $ae->extract or die $ae->error;
+
+	my $files = $ae->files;
+
+	my $name_of_csv = $files->[0];
+
+	use Text::CSV;
+	my $csv = Text::CSV->new( {
+			binary => 1, }
+	) or die "Cannot use CSV: ".Text::CSV->error_diag ();
+
+	my @formatted_rows;
+	my $column_names = [];
+	my $x = 0;
+	open my $fh, "<:encoding(iso-8859-1)", $Bin . '/' . $name_of_csv or die $Bin . '/' . $name_of_csv . ": $!";
+	while ( my $row = $csv->getline( $fh ) ) {
+		if($x == 0) {
+			$column_names = $row;
+		}
+		else {
+			my $y = 0;
+			my %row = ();
+			foreach my $field (@$row) {
+				$row{$column_names->[$y]} = $field;
+				$y++;
+			}
+			push @formatted_rows, \%row;
+		}
+
+		$x++;
+	}
+	$csv->eof or $csv->error_diag();
+	close $fh;
+
+	foreach my $row (@formatted_rows) {
+
+		warn $row->{NAME};
+
+		my @designer = split(/ /, $row->{DESIGNER});
+
+		my $designer_last_name = pop(@designer);
+		my $designer_first_name = join(@designer);
+
+		my $author = $schema->resultset('Author')->find_or_create(
+			{
+				'first_name' => $designer_first_name,
+				'last_name'  => $designer_last_name,
+				'site'       => 'fonts.com'
+			},
+		);
+
+		my $font = $schema->resultset('Font')->update_or_create(
+			{
+				name      => $row->{NAME},
+				sku       => $row->{SKU},
+				type      => 1,
+				buy_url   => $row->{BUYURL},
+				image_url => $row->{IMAGEURL},
+				paid      => 1,
+				web_name  => web_encode($row->{NAME}),
+				author    => $author->id
+			},
+		);
+
+		my $font_id = $font->id;
+
+		my @keywords = split(/,/, $row->{KEYWORDS});
+		
+		my @categories = ();
+		foreach my $keyword (@keywords) {
+			my $result = $schema->resultset('Category')->find_or_create(
+				{
+					'name' => $keyword
+				},
+			);
+
+			push(@categories, $result->id);
+		}
+
+		foreach my $category (@categories) {
+			my $result = $schema->resultset('CategoryFont')->find_or_create(
+				{
+					'font'     => $font_id,
+					'category' => $category
+				},
+			);
+		}
+
+	}
+
+}
+
+sub web_encode {
+
+    my ( $font_name ) = @_;
+
+    $font_name =~ s/\s+//g;
+    $font_name =~ s/\///g;
+
+    return $font_name;
+}

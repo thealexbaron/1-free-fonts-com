@@ -1,0 +1,305 @@
+	.document_wrapper {
+		/* /static/images/quote_bottom.jpg */
+		background-image:url('/static/images/quote_bottom.jpg');
+		background-repeat:repeat-x;
+		background-position:bottom;
+		width:613px;
+		border-left: solid 1px #d4d4d4;
+	}
+	.document_block {
+		padding-top:18px;
+		padding-bottom:22px;
+		padding-right:12px;
+		padding-left:10px;
+		/* border-bottom:1px solid gray; */
+		overflow:hidden;
+		/* font-size:17px; */
+		clear:both;
+	}
+	.document_block i {
+		font-size:12px;
+	}
+    
+    .document_text {
+        padding:20px;
+        font-size:18px;
+        color:#2d3f00;
+        margin-bottom:8px;
+        width:517px;
+        margin-right:10px;
+        float:left;
+    }
+    .document_text a, .document_text a:hover {
+        font-size:18px;
+        color:#2c2c2c;
+        text-decoration:none;
+        margin-bottom:8px;
+    }
+
+	.RateSection {
+		font-size:11px;
+		padding-top:5px;
+	}
+
+	.RateSection input {
+		height: 11px;
+		margin: 0;
+		vertical-align: middle;
+
+	}
+	.RateSection Button {
+		font-size: 9px;
+		margin-left: 8px;
+		vertical-align: middle;
+	}
+	.author_found_it, div#content .author_found_it a {
+		font-size:25px;
+	}
+	#author_table td { 
+		padding-right: 29px;
+	}
+	.author_results {
+		margin-bottom:15px;
+		clear:both;
+	}
+	.suggestions, div.suggestions a {
+		font-size:11px;
+		color: gray;
+	}
+	div.suggestions a:hover {
+		color: black;
+	}	
+	.suggestions {
+		float:right;
+	}
+
+	.share_this {
+        float: left;
+        margin-left: 15px;
+        font-size: 11px;
+	}
+	.share_this input {
+
+		font-size:9px;
+	}
+	.topics {
+		float: left;
+        clear:left;
+
+	}
+	div.topics, div.topics a {
+		font-size: 10px;
+	}
+	.author_detail {
+		font-size:12px;
+		width:545px;
+		overflow:hidden;
+		margin:auto;
+		padding:20px;
+		background: #f8dfd1;
+		margin-bottom: 5px;
+		margin-top: 5px;
+		border: solid 2px #b76128;
+	}
+	.category_detail {
+		font-size:12px;
+
+		overflow:hidden;
+		margin:auto;
+		padding:20px;
+		margin-bottom: 5px;
+		margin-top: 5px;
+	}
+
+    /* COMMENT STUFF */
+
+    /* comment input */
+    .comment {
+        clear:both;
+        float:left;
+        width:591px;
+        /* margin-top:14px; */
+    }
+
+    .comment textarea {
+        padding-left:2px;
+        float:left;
+        width: 400px;
+        margin:0;
+        height:8px;
+        line-height:1;
+        font-size:12px;
+        font-family:arial;
+        margin-bottom: 4px;
+    }
+
+    .comment img {
+        float:left;
+        padding-top:1px;
+        margin-right: 4px;
+    }
+
+    /* list of existing comments */
+
+    .comments {
+        clear:both;
+        font-size:12px;
+    }
+
+    .comments img {
+        float:left;
+        padding-top:1px;
+        margin-right: 4px;
+    }
+
+    .comments .comment_unit {
+        margin-top:5px;
+        float:right;
+    }
+    .unique_comment_unit {
+        display:none;
+    }
+
+    .comments .comment_side {
+        float:left;
+        width: 492px;
+        padding:5px;
+        border: 1px solid #e4e4e4;
+        background-color:white;
+    }
+    .comments .comment_text {
+        color:#393939;
+    }
+    .comments .comment_date {
+        color:#727272;
+        font-size: 10px;
+    }
+    .comments .comment_image {
+        float:left;
+    }
+
+    .existing_comments {
+        display:none;
+    }
+    .new_comments {
+
+    }
+    .new_comment .comment_side {
+        background-color:#f1fdd3;
+    }
+
+    .comments .current_user {
+        background-color: #fdfad3;
+    }
+
+    /* EDIT QUOTE BUTTON AND MENU */
+
+    .edit_document {
+        width:24px; 
+        height:22px; 
+        position:relative; 
+        z-index:100; 
+        font-family:arial, sans-serif; 
+        padding:0;
+        float:right;
+        display:none;
+    }
+
+    .document_block:hover .edit_document {
+        display:block;                       
+    }
+
+    /* hack to correct IE5.5 faulty box model 
+     * html .edit_document {width:746px; w\idth:745px;} */
+        /* remove all the bullets, borders and padding from the default list styling */
+        .edit_document ul {
+            padding:0;
+            margin:0;
+            list-style-type:none;
+    }
+    .edit_document ul ul {
+        width:120px;
+    }
+
+    /* float the list to make it horizontal and a relative positon so that you can control the dropdown menu positon */
+    .edit_document ul li ul li {
+        float:left;
+        width:120px;
+        position:relative;
+    }
+
+    /* style the links for the top level */
+    .edit_document a, 
+    .edit_document a:visited {
+        display:block;
+        font-size:12px;
+        text-decoration:none; 
+        color:gray; 
+        height:27px; 
+        background:white; 
+        padding-left:10px; 
+        line-height:29px; 
+    }
+
+    a.edit_document_button, 
+    .edit_document_button a:visited,
+    .edit_document_button :hover > a, 
+    .edit_document_button ul ul :hover > a {
+        display:block;
+        padding:0;
+        background:none;
+        height:22px;
+    }
+
+    /* a hack so that IE5.5 faulty box model is corrected */
+    * html .edit_document a, * html .edit_document a:visited {
+        width:120px;
+        w\idth:110px;
+    }
+
+    /* hide the sub levels and give them a positon absolute so that they take up no room */
+    .edit_document ul ul {
+        visibility:hidden; 
+        position:absolute;
+        height:0;
+        top:22px;
+        right:0; 
+        width:120px;
+    }
+    /* another hack for IE5.5 */
+    * html .edit_document ul ul {
+        top:30px;
+        t\op:31px;
+    }
+
+    /* style the table so that it takes no ppart in the layout - required for IE to work */
+    .edit_document table {
+        position:absolute; 
+        top:0; 
+        right:0; 
+        border-collapse:collapse;
+    }
+
+    /* yet another hack for IE5.5 */
+    * html .edit_document ul ul a, * html .edit_document ul ul a:visited {
+        width:120px;
+        w\idth:98px;
+    }
+
+    /* style the top level hover */
+    .edit_document ul ul a:hover {
+        color:#000; 
+        background:#fcd6a7;
+    }
+
+    .edit_document :hover > a, .edit_document ul ul :hover > a {
+        color:#000; 
+        background:#fcd6a7;
+    }
+
+    /* make the second level visible when hover on first level list OR link */
+    /* .edit_document ul li:hover ul {visibility:visible;} */
+
+    .edit_document_menu {
+        border: 1px solid gray;
+    }

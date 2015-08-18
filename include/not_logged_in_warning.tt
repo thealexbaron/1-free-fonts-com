@@ -1,0 +1,39 @@
+[%- UNLESS c.user_exists -%]
+<style type="text/css">
+    .login_prompt { 
+        display:none;
+    }
+</style>
+<div class="error login_prompt" style="overflow:hidden;">
+    <div style="float:right;"><a href="#null" class="hide_login_prompt"> X</a></div>
+    <div style="float:left;width:520px;">Please <a href="/signup">create an account</a> or <a href="#null" class="login_button">login</a> to add your own quotes, favorite quotes, and more!</div>
+</div>
+
+<script type="text/javascript" src="/static/js/jquery.cookie.js"></script>
+
+<script type="text/javascript"> 
+$(document).ready(function(){
+
+check_if_hide_login_prompt();
+
+/* http://www.electrictoolbox.com/jquery-cookies/ */
+
+$(".hide_login_prompt").click(
+ function()
+ {
+     $.cookie("hide_login_prompt", "true", { path: '/', expires: 7 });
+     check_if_hide_login_prompt();
+ }
+)
+
+function check_if_hide_login_prompt() {
+    if($.cookie("hide_login_prompt") == 'true') {
+        $(".login_prompt").fadeOut();
+    }
+    else {
+        $(".login_prompt").show();
+    }
+}
+});
+</script>
+[%- END -%]

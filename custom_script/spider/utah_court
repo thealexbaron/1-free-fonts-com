@@ -1,0 +1,309 @@
+#!/opt/perl/bin/perl
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use FindBin '$Bin';
+use lib "$FindBin::Bin/../../lib";
+use Harvest::Schema; # should be its own schema
+
+use Catalyst::Plugin::Cache;
+use Cache::Memcached::libmemcached;
+
+use Util::Spider;
+use Util::Misc;
+use Digest::MD5;
+
+use WWW::Scripter;
+
+my %site = (
+    base    => 'https://courtapps.utcourts.gov',
+    login   => '/XchangeWEB/login'
+);
+
+my %config;
+
+{
+    package MockApp;
+    use base qw/Catalyst::Plugin::Cache/;
+    sub registered_plugins {}
+    %config = (
+        memcached_life_in_days => 5,
+        'Plugin::Cache' => {
+            backend => {
+                class => 'Cache::Memcached::libmemcached',
+                servers => [ '127.0.0.1:11211' ],
+                namespace => 'testing',
+            }
+        }
+    );
+    sub config { \%config }
+}
+
+MockApp->setup;
+
+MockApp->register_cache_backend(
+        default => Cache::Memcached::libmemcached->new({
+        servers => $config{'Plugin::Cache'}{backend}{servers},
+    })
+);
+
+exit(main());
+
+sub main {
+    my $conf = get_conf() or return 1;
+
+    process($conf) or return 1;
+
+    return 0;
+}
+
+sub process {
+    my ($conf) = @_;
+
+    my $c = bless {}, 'MockApp';
+    my $cache = $c->cache;
+    #my $schema = Harvest::Schema->connect(
+    #    'dbi:mysql:database=greatquotes',
+    #    'greatquotes',
+    #    'RZmtyRk8qqO1'
+    #);
+
+    my $mech = Util::Spider::create_mech_object();
+    $mech->agent( 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/535.7 (KHTML, like Gecko) Chrome/16.0.912.63 Safari/535.7' );
+
+    warn 'Get content for: ' . $site{base}.$site{login} . "\n";
+
+    $mech->get( $site{base}.$site{login} );
+    unless($mech->success) {
+        warn "Mech failure.\n";
+        warn $mech->status();
+
+        return;
+    }
+
+    $mech->submit_form(
+        form_name => 'login',
+        fields => {
+            username => 'sharifi',
+            password => 'Felu9E'
+        }
+    );
+
+    my $main_page = Util::Spider::get_page_content($cache, $site{base}.'/XchangeWEB/CaseSearchServlet', $mech, 1);
+
+    $main_page =~ m{(<form\b[^>]*>)}; # the html is muffed to high hell, so a custom regex was necessary
+
+    die "No form was found on page. Stopping.\n" unless $1;
+
+    my $raw_form = "$1</form>";
+    $raw_form =~ s/'/"/g;
+
+    my $form_tree = HTML::TreeBuilder->new_from_content($raw_form);
+    my $form = $form_tree->look_down(
+        '_tag' => 'form',
+    );
+    
+
+    die "Main form was not found." unless $form;
+
+    my $session_key = $form->attr('action');
+    $form_tree->delete();
+    $form->delete();
+    
+    die "Session key is mandatory." unless $session_key;
+
+    $mech->post(
+        $site{base} . "/XchangeWEB/$session_key", # Example: 'https://courtapps.utcourts.gov/XchangeWEB/CaseSearchServlet?_=gyRWOWiixsKPNwj%2Bv8UH3lE0xAQrpFdW',
+        [
+            currentPage => 1,
+            sortBy => '',
+            sortOrder => 'ASC',
+            OldShowDatePanel => 'false',
+            OldCourtType => '',
+            OldSearchType => '',
+            OldSearchScope => '',
+            OldCaseNum => '',
+            OldCaseType => '',
+            OldCitationNum => '',
+            OldCountyCode => '',
+            OldLocationCode => '',
+            OldPartyCode => '',
+            OldPartyFirstName => '',
+            OldPartyLastName => '',
+            OldBirthDate => '',
+            OldStartFilingDate => '',
+            OldEndFilingDate => '',
+            OldJudgmentStartDate => '',
+            OldJudgmentEndDate => '',
+            OldJudgmentStartDispDate => '',
+            OldJudgmentEndDispDate => '',
+            OldKaseStartDispDate => '',
+            OldKaseEndDispDate => '',
+            courtType => 'district',
+            chkDatePanel => 'on',
+            searchType => 'case',
+            searchScope => 'statewide',
+            countyCode => '01',
+            locationCode => '2502',
+            caseNumber => '',
+            caseType => 'FS',
+            citationNumber => '',
+            partyLastName => '',
+            partyFirstName => '',
+            birthDate => '',
+            caseStartFilingDate => '12-15-2011',
+            caseEndFilingDate => '12-15-2011',
+            caseStartDispDate => '',
+            caseEndDispDate => '',
+            judgmentStartDate => '',
+            judgmentEndDate => '',
+            judgmentStartDispDate => '',
+            judgmentEndDispDate => '',
+            message => '',
+        ]
+    );
+
+    unless($mech->success) {
+        warn "Mech failure.\n";
+        warn $mech->status();
+
+        return;
+    }
+
+    my $main_page_tree = HTML::TreeBuilder->new_from_content($mech->response->decoded_content);
+
+    my $pagination = $main_page_tree->look_down(
+        id => 'pagination',
+    );
+
+    my @pages = [];
+    if($pagination) {
+        $pagination->as_text =~ m{([ 0-9]+)};
+        @pages = split(' ', $1);
+    }
+
+    $main_page_tree->delete;
+    $pagination->delete;
+
+    my $main_page_table_tree = HTML::TreeBuilder->new_from_content($mech->response->decoded_content);
+
+    my $main_page_table = $main_page_table_tree->look_down(
+        '_tag'  => 'table',
+        width => '95%',
+        cellspacing => 1,
+        cellpadding => 1,
+        align => 'center',
+    );
+
+    die "Main table not found.\n" unless $main_page_table;
+
+    my @main_page_table_tr = $main_page_table->look_down(
+        '_tag'  => 'tr',
+        class => 'bottomborder',
+    );
+
+    foreach my $row (@main_page_table_tr) {
+        warn $row->as_text;
+        $row->delete;
+    }
+
+    #warn $main_page_table_tr->as_HTML;
+
+    $main_page_table_tree->delete;
+    $main_page_table->delete;
+
+    return;
+
+    foreach my $page (@pages) {
+        next if $page eq '1';
+        $mech->post(
+            $site{base} . "/XchangeWEB/$session_key", # Example: 'https://courtapps.utcourts.gov/XchangeWEB/CaseSearchServlet?_=gyRWOWiixsKPNwj%2Bv8UH3lE0xAQrpFdW',
+            [
+                currentPage => $page,
+                sortBy => '',
+                sortOrder => 'ASC',
+                OldShowDatePanel => 'false',
+                OldCourtType => '',
+                OldSearchType => '',
+                OldSearchScope => '',
+                OldCaseNum => '',
+                OldCaseType => '',
+                OldCitationNum => '',
+                OldCountyCode => '',
+                OldLocationCode => '',
+                OldPartyCode => '',
+                OldPartyFirstName => '',
+                OldPartyLastName => '',
+                OldBirthDate => '',
+                OldStartFilingDate => '',
+                OldEndFilingDate => '',
+                OldJudgmentStartDate => '',
+                OldJudgmentEndDate => '',
+                OldJudgmentStartDispDate => '',
+                OldJudgmentEndDispDate => '',
+                OldKaseStartDispDate => '',
+                OldKaseEndDispDate => '',
+                courtType => 'district',
+                chkDatePanel => 'on',
+                searchType => 'case',
+                searchScope => 'statewide',
+                countyCode => '01',
+                locationCode => '2502',
+                caseNumber => '',
+                caseType => 'FS',
+                citationNumber => '',
+                partyLastName => '',
+                partyFirstName => '',
+                birthDate => '',
+                caseStartFilingDate => '12-15-2011',
+                caseEndFilingDate => '12-15-2011',
+                caseStartDispDate => '',
+                caseEndDispDate => '',
+                judgmentStartDate => '',
+                judgmentEndDate => '',
+                judgmentStartDispDate => '',
+                judgmentEndDispDate => '',
+                message => '',
+            ]
+        );
+
+    }
+
+    # alexb: courtapps.utcourts.gov system will only return a maximum of 500 rows / 10 pages of 50 rows
+
+    # go through each row on each page and look at:
+    # <a href="#" onclick="SmartScroller_GetCoords(); openPopup('CaseSearchServlet?_=gyRWOWiixsJuFrzyL1b74aofSV8qNf%2BuE3ZZWXMXVIkuWfzhUvOkX4s89YjuV3KpZrmnsZNOQWTn%0AFU2ZYcsBKqtzBi8mXinW', 'Partydetails0', 480, 1000);setTimeout('SmartScroller_Scroll()', 2000);">STATE OF UTAH</a>
+    # and use that to go to https://courtapps.utcourts.gov/XchangeWEB/CaseSearchServlet?_=gyRWOWiixsJuFrzyL1b74aofSV8qNf%2BuE3ZZWXMXVIkuWfzhUvOkX4s89YjuV3KpZrmnsZNOQWTn%0AFU2ZYcsBKqtzBi8mXinW
+
+    #my $content = $mech->response->decoded_content;
+    #warn $content;
+    #warn "https://courtapps.utcourts.gov/XchangeWEB/$session_key";
+
+}
+
+sub my_warn {
+    my ($message) = @_;
+
+    open my $fh, '>>', '/tmp/wiki_spider.log';
+    print $fh "$message\n";
+
+}
+
+sub get_conf {
+    my $conf = {};
+    my $result = GetOptions(
+        $conf,
+        'iterations=i',
+    );
+    unless ($result) {
+        warn 'error getting options';
+        return;
+    }
+    #use Data::Dumper; die Dumper($conf);
+
+    return $conf;
+}
+
+

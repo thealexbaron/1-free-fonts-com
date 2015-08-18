@@ -1,0 +1,322 @@
+#!/opt/perl/bin/perl
+
+use strict;
+use warnings;
+
+#BEGIN { $Devel::Leak::Object::TRACKSOURCELINES = 1; }
+
+use Getopt::Long;
+use FindBin '$Bin';
+use lib "$FindBin::Bin/../../lib";
+use SearchQuotes::Schema;
+
+use Catalyst::Plugin::Cache;
+use Cache::Memcached::libmemcached;
+
+use Util::Spider;
+use Util::Misc;
+use Digest::MD5;
+use Image::Magick;
+
+my ${site} = 'http://en.wikipedia.org';
+
+my %config;
+
+{
+    package MockApp;
+    use base qw/Catalyst::Plugin::Cache/;
+    sub registered_plugins {}
+    %config = (
+        memcached_life_in_days => 5,
+        'Plugin::Cache' => {
+            backend => {
+                class => 'Cache::Memcached::libmemcached',
+                servers => [ '127.0.0.1:11211' ],
+                namespace => 'testing',
+            }
+        }
+    );
+    sub config { \%config }
+}
+
+MockApp->setup;
+
+MockApp->register_cache_backend(
+    default => Cache::Memcached::libmemcached->new({
+        servers => $config{'Plugin::Cache'}{backend}{servers},
+    })
+);
+
+
+exit(main());       # exit(main()); is magic
+
+
+sub main {
+    my $conf = get_conf() or return 1;
+
+    process($conf) or return 1;
+
+    return 0;
+}
+
+sub process {
+    my ($conf) = @_;
+
+    my $c = bless {}, 'MockApp';
+    my $cache = $c->cache;
+    my $schema = SearchQuotes::Schema->connect(
+        'dbi:mysql:database=greatquotes',
+        'greatquotes',
+        'RZmtyRk8qqO1'
+    );
+
+    my $mech = Util::Spider::create_mech_object();
+
+    my $base_path = ${site} . '/w/index.php?&search=';
+
+    my $author_result = $schema->resultset('Author')->search(
+        {
+            id => { ">" => 219353 } # start incrementing at
+        },
+        {
+            result_class => 'DBIx::Class::ResultClass::HashRefInflator',
+            #order_by => { -asc => 'id' }, # unnecessary/inefficient
+        }
+    );
+
+    # incrementation starts at 7983
+    # <title> tag indicators
+    # Not exact match: Ronn Regan - Search results - Wikipedia, the free encyclopedia
+    # Exact match: Ron Reagan - Wikipedia, the free encyclopedia
+
+    my $count = 0;
+
+    my $missing_birth_count = 0;
+    my $added_birth_count = 0;
+
+    my $missing_death_count = 0;
+    my $added_death_count = 0;
+
+    my $missing_picture_count = 0;
+    my $added_picture_count = 0;
+
+    while (my $result = $author_result->next) {
+        $count++;
+        my_warn($result->{id} . ": Find author info. $count " . $result->{complete_name});
+        #my $uploaddir = $c->path_to(qw[ root static images authors ]);
+        my $uploaddir = '/home/squotes/SearchQuotes/root/static/images/authors';
+        my $picture_exists = Util::Misc::check_if_file_exists($c, "$uploaddir/".$result->{id}.".jpg");
+        
+        my $item = $result->{complete_name};
+        $item =~ tr/ /+/;
+        $item =~ s/[ ,]+$//g;
+        my $main_page = Util::Spider::get_page_content($cache, ${base_path}.${item}, $mech, 0);
+        unless ($main_page) {
+            my_warn("No content. Skip.");
+            next;
+        }
+
+        my $tree = HTML::TreeBuilder->new_from_content($main_page);
+        #$tree->parse($main_page);
+
+        if($tree->look_down('_tag' => 'title')->as_text =~ /search results/i) {
+            my_warn("Not an exact match. Skip");
+            $tree->delete();
+            next;
+        }
+        elsif($tree->as_text =~ /may refer to:/i) {
+            my_warn("Multiple possibilites. Skip");
+            $tree->delete();
+            next;
+        }
+
+        my $main_page_image_table = $tree->look_down(
+            '_tag', 'table',
+            class => qr/infobox/
+        );
+
+        $tree->delete();
+      
+        if(!$main_page_image_table) {
+            my_warn("No details table. Skip");
+            next;
+        }
+
+        my $author = $schema->resultset('Author')->search(
+            { 
+            id => $result->{id},
+            },
+        );
+
+        if(!$result->{birth} || $result->{birth} eq '0000-00-00') {
+            $missing_birth_count++;
+            my $birth = $main_page_image_table->look_down(
+                '_tag' => 'span',
+                class => 'bday',
+            );
+            if($birth) {
+                $added_birth_count++;
+                my_warn("Add birth: " . $birth->as_text);
+                $author->update({
+                    birth => $birth->as_text
+                });
+                $birth->delete();
+            }
+        }
+
+        if(!$result->{death} || $result->{death} eq '0000-00-00') {
+            $missing_death_count++;
+            my $death = $main_page_image_table->look_down(
+                '_tag' => 'span',
+                class => 'dday',
+            );
+            if($death) {
+                $added_death_count++;
+                my_warn("Add death: " . $death->as_text);
+                $author->update({
+                    death => $death->as_text
+                });
+                $death->delete();
+            }
+        }
+
+        if($picture_exists) {
+            my_warn("We already have a picture of this author.");
+        }
+        else {
+
+            $missing_picture_count++;
+
+            my $main_page_image = $main_page_image_table->look_down(
+                '_tag' => 'a',
+                class => 'image'
+            );
+
+            if(!$main_page_image) {
+                my_warn("No image found from Wiki. Skip");
+            }
+            else {
+                my $dedicated_image_page = Util::Spider::get_page_content($cache, ${site}.$main_page_image->attr('href'), $mech, 0);
+                $main_page_image->delete();
+
+                my $tree2 = HTML::TreeBuilder->new_from_content($dedicated_image_page);
+                #$tree->parse($dedicated_image_page);
+
+                my $hires_image = $tree2->look_down('class' => 'fullImageLink')->look_down('_tag' => 'a')->attr('href');
+                $tree2->delete();
+                my $download_success = Util::Spider::download_file($mech, 'http:'.$hires_image, "$uploaddir/".$result->{id}.'-original');
+                $hires_image->delete();
+
+                $added_picture_count++ if $download_success;
+
+                create_images($result->{id}, $uploaddir);
+
+                my_warn("Added author image for: " . $result->{id});
+            }
+        }
+
+        $main_page_image_table->delete();
+
+        #last if $count > 200; #temp
+
+        if ($conf->{iterations} && $count >= $conf->{iterations}) {
+            warn "stopping at iteration $conf->{iterations} as requested";
+            last;
+        }
+    }
+
+    my_warn("[[Added $added_birth_count of $missing_birth_count missing birth info.]]");
+    my_warn("[[Added $added_death_count of $missing_death_count missing death info.]]");
+    my_warn("[[Added $added_picture_count of $missing_picture_count missing picture.]]");
+    my_warn("TOTAL OF $count PROCESSED.");
+
+}
+
+sub my_warn {
+    my ($message) = @_;
+
+    open my $fh, '>>', '/tmp/wiki_spider.log';
+    print $fh "$message\n";
+
+}
+
+sub create_images {
+
+    my ($id, $uploaddir) = @_;
+
+    my $file_name = "$id.jpg";
+    my $file_name_small = "$id-small.jpg";
+    my $file_name2 = "$id-original.jpg";
+
+    my $image = Image::Magick->new;
+    $image->Read("$uploaddir/$file_name2");
+
+    jpg_cleanup($image);
+    my $oldmask = umask 002;
+    $image->Write("$uploaddir/$file_name");
+    $image->Write("$uploaddir/$file_name_small");
+    umask $oldmask;
+
+    my $height = $image->Get('rows') || 1;
+    my $width = $image->Get('columns') || 1;
+
+    if ($height > 150) {
+        my $scaled_width;
+        $image->Set( Gravity => 'Center' );
+        $image->Resize( geometry => '150x150' );
+        $image->Extent( geometry => '150x150' );
+        $image->Trim();
+        $image->Set(antialias=>'True');
+        my $oldmask = umask 002;
+        $image->Write("$uploaddir/$file_name");
+        umask $oldmask;
+    }
+
+    if ($width > 40) {
+        my $scaled_width;
+        $image->Set( Gravity => 'Center' );
+        $image->Resize( geometry => '40x40' );
+        $image->Extent( geometry => '40x40' );
+        $image->Trim();
+        $image->Set(antialias=>'True');
+        my $oldmask = umask 002;
+        $image->Write("$uploaddir/$file_name_small");
+        umask $oldmask;
+    }
+}
+
+sub jpg_cleanup {
+    my ($image) = @_;
+
+    # Fix for IE8: If image colorspace is CMYK, convert to RGB.
+    # IE8 dropped support for CMYK JPEG images.
+    if (uc $image->Get('colorspace') eq 'CMYK') {
+        $image->Quantize(colorspace => 'RGB');
+    }
+
+    # Remove spurious housekeeping information that various image editors like
+    # to add.
+    #
+    # This has the pleasant side effect of reducing the image file size and
+    # making images load MUCH faster in the browser.
+    #
+    $image->Strip;
+
+    return;
+}
+
+sub get_conf {
+    my $conf = {};
+    my $result = GetOptions(
+        $conf,
+        'iterations=i',
+    );
+    unless ($result) {
+        warn 'error getting options';
+        return;
+    }
+    #use Data::Dumper; die Dumper($conf);
+
+    return $conf;
+}
+

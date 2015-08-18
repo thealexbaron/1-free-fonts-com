@@ -1,0 +1,34 @@
+[% WRAPPER admin/test/wrapper.tt
+    title = 'Unicode &lt;=&gt; DB roundtrip test results'
+%]
+    Submitted text (from request, not db): [% submitted %]<br /><br />
+    Data fetched back from the database:<br /><br />
+    <table>
+    [%- WHILE (row = strings.next) -%]
+    <tr>
+        <td>
+            [% row.testtext %]
+        </td>
+    </tr>
+    [%- END -%]
+    </table>
+    <br />
+    <table border="1">
+    MySQL Character Set-related Session Variables<br /><br />
+    [%-# USE Dumper; Dumper.dump(vars) %]
+    [%- FOREACH var IN vars -%]
+    <tr>
+        <td>
+            [% var.name %]
+        </td>
+        <td>
+            [% var.value %]
+        </td>
+    </tr>
+    [%- END -%]
+    </table>
+    <br />
+    <form method="POST" action="delete_from_cat_test">
+        <input type="submit" name="delete_from_cat_test" value="Delete test rows" />
+    </form>
+[% END %]

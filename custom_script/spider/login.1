@@ -1,0 +1,87 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+
+
+
+
+<HTML>
+
+
+<HEAD>
+<META name="GENERATOR" content="IBM WebSphere Studio">
+
+<script language="javascript" src="/XchangeWEB/javascript/PopupWindow.js"></script>
+<script language="JavaScript" type="text/javascript">
+if(parent.frames.length!=0)top.location.href='/XchangeWEB/login.jsp';
+</script>
+<style type="text/css">
+     @import url(/XchangeWEB/css/xchange.css); /*IE and NN6x styles*/
+</style>
+<TITLE>Xchange Login</TITLE>
+</HEAD>
+<BODY style=margin:0px bgcolor="#ffffff">
+ <div id="loginheader" class="loginheader" style="background-color:rgb(69,140,199)"><img src="/XchangeWEB/images/UT_State_logo.gif"></div>
+<TABLE width="100%" border="0" cellspacing="0" cellpadding="0" background="/XchangeWEB/images/topback.gif">
+		<TR>
+			<TD width="100%" height="68" valign="top">
+				<h3 align="center">Utah State Courts - XChange System</h3>
+			</TD>
+		</TR>
+</TABLE>
+<!-- TODO:	Display the Xchange system message via a message webservice or connecting to common db to 
+retrieve the message that is stored in Message Table in Common DB.-->
+
+<noscript><br><br><div id="noscript_msg" align="center"><FONT color="red" face="arial" style="font-weight:bold;">You need to have JavaScript enabled to use this system.</FONT></div></noscript>
+
+	<div id="mainarea" style = "display:none">
+	<script>
+		document.getElementById("mainarea").style.display="";
+	</script>
+	<center>
+	<br/><div style="display:none;width: 500px;" align="center" id="message">
+		<FONT color="red" face="arial"></FONT>
+	</div>
+	
+		</center>
+		<h3 align="center">Please enter a username and password and click &quot;Login&quot;</h3>
+		<FORM name="login" action="login" method="POST">
+			
+			<TABLE class="TranscriptTableNoBorder" border="0" cellspacing="0" cellpadding="5" width='30%'
+				align="center">
+				<TR>
+					<td width="25%">&nbsp;</td>
+					<TD valign="top" width="25%" class=headline>Username</TD>
+					<TD width="50%" valign="top" >
+					    <INPUT type="text" name="username" id="username" value="" width="14" tabindex="1">
+					          <script language="Javascript">document.getElementById('username').focus()</script>
+		            </TD>
+				</TR>
+				<TR>
+					<td>&nbsp;</td>
+					<TD valign="top" class="headline">Password</TD>
+					<TD valign="top" ><INPUT type="password" name="password" value="" tabindex="2"/></TD>
+				</TR>
+				<TR>
+					<td>&nbsp;</td>
+					<TD valign="top"><INPUT type="submit" name="submit" value="Login"></TD>
+					<TD><a href="#" onclick="openPopup('PasswordServlet?_=3GF15I6gOLVNkD5z4Y3V8w%3D%3D', 'Password', 300, 500);">Forgot Password?</a><br>	
+						<a href="#" onclick="openPopup('PasswordServlet?_=MgSw0W9mXEeN4IGLFUHNPQ%3D%3D', 'Password', 300, 500);">Password Expired?</a><br><br>
+					</TD>
+				</TR>
+				<tr>
+				  <td colspan="3" align="center"><font color="red"><b>Username and password are case sensitive</b></font>
+				  </td>
+				</tr>
+			</TABLE>
+			<BR>
+			
+		</FORM>
+	
+	</div>
+</BODY>
+<SCRIPT>
+	document.getElementById( "username" ).focus();
+</SCRIPT>
+<HEAD><META HTTP-EQUIV='expires' CONTENT='0'><META HTTP-EQUIV='Pragma' CONTENT='no-cache'><META HTTP-EQUIV='Cache-Control' CONTENT='no-store'></HEAD>
+</HTML>

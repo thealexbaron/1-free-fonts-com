@@ -1,0 +1,8 @@
+#!/bin/sh
+
+user=fonts
+pass=cacaca1
+
+script/harvest_create.pl model DB DBIC::Schema Harvest::Schema create=static components=TimeStamp,EncodeColumns dbi:mysql:database=fonts $user $pass
+
+

@@ -1,0 +1,150 @@
+[%- xhr = c.req.header('x-requested-with') FILTER lower;
+    IF xhr == 'xmlhttprequest';
+        SET is_xhr = 1;
+        wrapper = "empty_wrapper.tt";
+    ELSE;
+        SET is_xhr = 0;
+        title = "Sign Up";
+        wrapper = "wrapper.tt";
+    END
+-%]
+
+[% WRAPPER $wrapper %]
+
+<!-- This form requires jquery.form.js and jquery.ajax_error.js to work -->
+
+<script type="text/javascript">
+$(document).ready(function(){
+
+    $('#signup').ajaxForm({
+
+        dataType:  'json',
+		beforeSubmit:  clear_all,
+        success: function(data, textStatus, jqXHR) { 
+            processJson(data, textStatus, jqXHR) 
+        }
+    }); 
+
+});
+
+function clear_all() {
+	$(".error_text").html("");
+	$("input").removeClass("error_box");
+}
+
+
+function check_user_exists() {
+
+		var username = $('#username').val();
+
+		$.ajax({
+  			url: "[% c.uri_for('/signup/check_user_exists') %]" + username,
+  			success: function(data) {
+
+				if(data.user_exists) {
+					$(".username_error").html("<span class='red'>User Name Already Taken</span><br />");
+				}
+				else {
+					$(".username_error").html("<span class='green'>User Name Available</span><br />");
+				}
+ 
+  			}
+  		});
+}
+</script>
+
+<style type="text/css">
+tbody tr:nth-child(even) td, tbody tr.even td {
+background: white;
+}
+
+th, td, caption {
+padding: 2px 10px 2px 5px;
+}
+
+
+.red {
+	color:red;
+}
+
+.green {
+	color:green;
+}
+
+.error_box {
+	color:red;
+	border:1px red solid;
+}
+
+.error_text {
+	color:red;
+}
+
+#signup input {
+	width:200px;
+}
+
+</style>
+
+<form action="[% c.uri_for('/signup/submit') %]" method="post" style="width:365px;" id="signup">
+<table>
+	<tr>
+		<td></td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>User Name:</td>
+		<td><input type="text" name="username" id="username"></td>
+	</tr>
+	<tr>
+		<td></td>
+		<td><div class="username_error"></div></td>
+	<tr>
+		<td>Email: </td>
+		<td><input type="text" name="email"></td>
+	</tr>
+	<tr>
+		<td></td>
+		<td><div class="email_error"></div></td>
+	</tr>
+	<tr>
+		<td>Password:</td>
+		<td><input type="password" name="password"></td>
+	</tr>
+	<tr>
+		<td></td>
+		<td><div class="password_error"></div></td>
+	</tr>
+	<tr>
+		<td>Retype Password:</td>
+		<td> <input type="password" name="retype_password"></td>
+	</tr>
+	<tr>
+		<td></td>
+		<td><div class="retype_password_error"></div></td>
+	</tr>
+	<tr>
+		<td>First Name:</td>
+		<td><input type="text" name="firstname"></td>
+	</tr>
+	<tr>
+		<td></td>
+		<td><div class="firstname_error"</div></td>
+	</tr>
+	<tr>
+		<td>Last Name:</td>
+		<td><input type="text" name="lastname"></td>
+	</tr>
+	<tr>
+		<td></td>
+		<td><div class="lastname_error"></div></td>
+	</tr>
+	<tr>	
+		<td><div class="database_error"></div></td>
+		<td><input type="submit" value="Sign Up!" style="float:right;"></td>
+	</tr>
+</table>
+
+</form>
+
+[% END %]

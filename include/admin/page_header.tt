@@ -1,0 +1,11 @@
+[% IF c.req.uri.search('/admin/test$') %]
+    [% left_link = '' %]
+[% ELSE %]
+    [% left_link = c.reg.uri _ ' <a href="/admin/test">Testing Home page</a>' %]
+[% END %]
+<div id="pgheader">
+    <div class="hdr-left">[% left_link %]</div>
+    <div class="hdr-right">Logged in as: [% c.user.uid %] | <a href="/logout">Log out</a></div>
+    <div class="hdr-center">[% title %]</div>
+    <div class="clr-both"></div>
+</div>

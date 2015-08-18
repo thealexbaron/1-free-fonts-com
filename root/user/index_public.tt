@@ -1,0 +1,68 @@
+[% WRAPPER wrapper.tt %]
+[%- title = BLOCK %]
+[% user.uid %]'s User Profile
+[% END %]
+
+<div class="ajaxupload">
+[% IF user.image %]<img src="/static/images/users/[% user.id %].jpg" alt="[% user.firstname %] [% user.lastname %]" />
+[% ELSE %]
+<img src="/static/images/authors/user.jpg" alt="Upload an Image" /><br />
+[% END %]
+</div>
+
+<h1>[% user.uid %]'s Quotes Profile</h1>
+
+[% user.firstname %] [% user.lastname %]<br />
+
+<hr class="space">
+
+<h2>About [% user.firstname %]</h2>
+<div class="edit" id="user_about">
+[%- UNLESS user.bio -%]
+[%- ELSE -%]
+[% user.bio %]
+[%- END -%]
+</div>
+
+<hr class="space">
+
+<h2>[% user.uid %]'s Quotes</h2>
+<table>
+<tbody>
+<tr>
+
+    <th class="span-8">Quote</th>
+	<th class="span-3">Category</th>
+	<th class="span-3 last">Status</th>
+</tr>
+[% WHILE (item = rs.next) %]
+<tr>
+	<td>[% item.quote %]</td>
+	<td>[% item.category_name %]</td>
+	<td>Pending...</td>
+</tr>
+[% END %]
+</tbody>
+</table>
+
+
+<h2>[% user.uid %]'s Favorites <img src="/static/images/favorite.png" alt="Favorites" /></h2>
+<table>
+<tbody>
+<tr>
+    <th class="span-8">Quote</th>
+	<th class="span-3">Category</th>
+	<th>Author</th>
+</tr>
+[% WHILE (item = favorite_result.next) %]
+<tr>
+	<td>[% item.quote %]</td>
+	<td>[% item.category.name.join(', ') %]</td>
+	<td>[% item.author.first_name %] [% item.author.last_name %]</td>
+
+</tr>
+[% END %]
+</tbody>
+</table>
+
+[% END %]

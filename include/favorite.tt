@@ -1,0 +1,23 @@
+[% IF loop.first %]<script type="text/javascript" src="/static/js/user_favorite.js"></script>[% END %]
+[%- IF item.favorite %]
+<style type="text/css">
+    .quote_wrapper[% item.id %] {
+        background-image:url('/static/images/quote_bottom_yellow.png');
+    }
+</style>
+[% END %]
+
+<div class="favorite[% UNLESS c.user_exists %] login_button[% END %]" [% UNLESS c.user_exists %]title="Favorite this Quote"[% END %] id="[% item.id %]favmain" [% IF item.favorite %]style="background: transparent url(/static/images/favorite.png) 0 0 no-repeat;"[% END %]>
+    <form>
+        <input type="hidden" name="id" value="[% item.id %]">
+        <input type="hidden" name="action" value="favorite">
+        <input type="hidden" name="type" value="document">
+        <input type="hidden" name="data" value="favorite">
+        <div class="left">
+            <a href="#" class="favorite_button[% UNLESS c.user_exists %] login_and_action[% END %]" id="[% item.id %].favorite.[% cache_key %]">
+                <span class="no_show">[% IF item.favorite %]Remove from Favorites[% ELSE %]Add to Favorites[% END %]</span>
+                <span id="[% item.id %]favorite">[% IF item.favorite %]Remove from Favorites[% ELSE %]Add to Favorites[% END %]</span>
+            </a>
+        </div>
+    </form>
+</div>

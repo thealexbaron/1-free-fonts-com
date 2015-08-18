@@ -1,0 +1,81 @@
+[%- xhr = c.req.header('x-requested-with') FILTER lower;
+    IF xhr == 'xmlhttprequest';
+        SET is_xhr = 1;
+        wrapper = "empty_wrapper.tt";
+    ELSE;
+        SET is_xhr = 0;
+        title = "Login";
+        wrapper = "wrapper.tt";
+    END
+-%]
+
+[% WRAPPER $wrapper %]
+<!-- This form requires jquery.form.js and jquery.ajax_error.js to work -->
+
+<script type="text/javascript">
+$(document).ready(function(){
+
+    $('.login').ajaxForm({
+	    beforeSubmit: clear_all,
+        success: function(data, textStatus, jqXHR) { 
+            processJson(data, textStatus, jqXHR) 
+        }
+    }); 
+
+    $("#userid").focus();
+
+});
+
+function clear_all() {
+	$(".error_text").html("");
+	$("input").removeClass("error_box");
+}
+
+</script>
+
+<style type="text/css">
+tbody tr:nth-child(even) td, tbody tr.even td {
+background: white;
+}
+
+th, td, caption {
+padding: 2px 10px 2px 5px;
+}
+
+.red {
+	color:red;
+}
+
+.green {
+	color:green;
+}
+
+</style>
+
+<form action="/login" method="post" style="width:265px;" class="login">
+    [% IF error_msg %]
+    <p class="error_msg">[% error_msg %]</p>
+    [% END %]
+<table>
+	<tr>
+		<td>User Name or Email:</td>
+		<td><input type="text" name="userid" id="userid"></td>
+	</tr>
+	<tr>
+		<td></td>
+		<td></td>
+	<tr>
+		<td>Password:</td>
+		<td><input type="password" name="password"></td>
+	</tr>
+	<tr>
+		<td></td>
+		<td><div class="login_error"></div></td>
+	</tr>
+	<tr>	
+		<td></td>
+        <td><small><a href="/forgotpassword">Forgot your password?</a></small> <br /><br /> <a href="/signup">Sign Up</a><input type="submit" value="Log In" style="float:right;"></td>
+	</tr>
+</table>
+</form>
+[%- END -%]

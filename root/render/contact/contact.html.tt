@@ -1,0 +1,9 @@
+<h2>[% c.config.site_name %]</h2>
+
+<b>Name:</b> [% c.stash.name %]<br />
+<b>Email:</b> [% c.stash.user_email %]<br />
+
+[% body %]
+
+<br />
+<h4>To respond to this user, simply reply to this email.</h4>

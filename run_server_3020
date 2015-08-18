@@ -1,0 +1,6 @@
+#!/bin/sh
+
+DBIC_TRACE=1
+export HARVEST_CONFIG=harvest-dev.conf
+script/harvest_server.pl -rd 5 -r -f -p 3020
+

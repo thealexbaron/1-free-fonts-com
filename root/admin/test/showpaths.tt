@@ -1,0 +1,71 @@
+[% WRAPPER admin/test/wrapper.tt
+    title = 'showpaths';
+    want_jquery = 1;
+%]
+    <style type="text/css">
+        table {
+            font-size: 13pt;
+            font-style: normal;
+            font-family:"Times New Roman", Times, serif;
+            border-collapse: collapse;
+        }
+        td {
+            padding:5px;
+        }
+        tr.odd {
+            background: #d5dbf5;
+        }
+        th {
+            text-align: left;
+        }
+        .highlighted {
+            background: salmon !important;
+        }
+    </style>
+[%- IF paths %]
+    [%- SET count = paths.size %]
+    <h3>
+    [%- IF search_term %]
+    Paths including the string '[% search_term %]': [%- count %]
+    [%- ELSE %]
+    Paths: [%- count %]
+    [%- END %]
+    </h3>
+<table>
+    <tr>
+        <th></th>
+        <th>#</th>
+        <th>Public URI Path</th>
+        <th>Chain endpoint action</th>
+    </tr>
+    [%- FOREACH item = paths %]
+    <tr class="[% loop.parity %]">
+        <td><input type="radio" name="markrow" class="marker"></td>
+        <td>
+            [%- loop.index + 1 %]
+        </td>
+        <td>
+            [%- item.path %]
+        </td>
+        <td>
+            [%- item.endpoint %]
+        </td>
+    </tr>
+    [%- END %]
+</table>
+[%- ELSE %]
+<p>No paths to display</p>
+[%- END %]
+<script type="text/javascript">
+    var last;
+    $(document).ready(function () {
+        $('input[name=markrow]:radio').click(function () {
+            if (last) {
+                $(last).parents('tr:first').toggleClass("highlighted");
+            }
+            $(this).parents('tr:first').toggleClass("highlighted");
+            last = this;
+        });
+    });
+</script>
+[% END %]

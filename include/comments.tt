@@ -1,0 +1,90 @@
+    <div class="comment">
+        [% IF c.user_exists AND c.user.image %]
+        <img src="/static/images/users/[% c.user.id %]-small.jpg" alt="[% c.user.uid %]" />
+        [% ELSE %]
+        <img src="/static/images/users/no-image-small.png" alt="user" />
+        [% END %]
+
+        <form name="comment">
+            <textarea class="clearme data comment_box" name="data" style="[%- IF c.user_exists %]width:453px;[%- ELSE %]width:401px;[%- END %]">Write a comment...</textarea>
+            <input type="hidden" name="id" value="[% item.number %]">
+            <input type="hidden" name="action" value="comment">
+            <input type="hidden" name="type" value="document">
+
+            <div class="buttons">
+                [% IF c.user_exists %]
+                <a href="#null" class="regular comment_button">
+                    Comment
+                </a>
+                [% ELSE %]
+                <a href="#null" class="regular login_and_action">
+                    Login &amp; Comment
+                </a>
+                [% END %]
+            </div>
+            <div class="data_error" style="clear:both;"></div>
+        </form>
+    </div>
+    <div class="comments">
+        [%- IF item.comments.size %]
+        <div class="existing_comments_show">
+            <div class="comment_unit">
+                <div class="comment_image">[% IF item.comments.0.user.image %]<img src="/static/images/users/[% item.comments.0.user.id %]-small.jpg" alt="[% item.comments.0.user.uid %]" />[% ELSE %]<img src="/static/images/users/no-image-small.png" alt="[% item.comments.0.user.uid %]" />[% END %]</div>
+                <div class="comment_side [% IF item.comments.0.user.uid == c.user.uid %]current_user[% END %]">
+                    <a href="/user/[% item.comments.0.user.uid %]" class="comment_user_name">[% item.comments.0.user.uid %]</a> <span class="comment_date">[% mydate.parse(item.comments.0.ts, 'MST7MDT').format('%l:%M%P %B %d, %Y') %]</span> <br />
+                    <div class="comment_text">[% item.comments.0.comment %]</div>
+                </div>
+            </div>
+        </div>
+        <div class="buttons show_comments">
+            <a href="#null" class="regular" style="width:485px; text-align:center;height: 14px;font-size: 11px;">
+                [% IF item.comments.size > 1 %]View All [% item.comments.size %] Comments[% ELSE %]View Comment[% END %]
+            </a>
+        </div>
+        <div class="existing_comments">
+            [% FOREACH comment IN item.comments %]
+            [% IF loop.first %][% ELSE %]
+            <div class="comment_unit">
+                <div class="comment_image">[% IF comment.user.image %]<img src="/static/images/users/[% comment.user.id %]-small.jpg" alt="[% comment.user.uid %]" />[% ELSE %]<img src="/static/images/users/no-image-small.png" alt="[% comment.user.uid %]" />[% END %]</div>
+                <div class="comment_side [% IF comment.user.uid == c.user.uid %]current_user[% END %]">
+                    <a href="/user/[% comment.user.uid %]" class="comment_user_name">[% comment.user.uid %]</a> <span class="comment_date">[% mydate.parse(comment.ts, 'MST7MDT').format('%l:%M%P %B %d, %Y') %]</span> <br />
+                    <div class="comment_text">[% comment.comment %]</div>
+                </div>
+            </div>
+            [% END %]
+            [% END %]
+        </div>
+        [%- END %]
+        <div class="new_comments"></div>
+    </div>
+
+    [% IF loop.first %]
+            <div class="unique_comment_unit">
+            <div class="comment_image">[% IF c.user_exists %][% IF c.user.image %]<img src="/static/images/users/[% c.user.id %]-small.jpg" alt="[% c.user.uid %]" />[% ELSE %]<img src="/static/images/users/no-image-small.png" alt="[% c.user.uid %]" />[% END %][% END %]</div>
+            <div class="comment_side">
+                <a href="#" class="comment_user_name"></a> <span class="comment_date"></span> <br />
+                <div class="comment_text"></div>
+            </div>
+        </div>
+        <script type="text/javascript" src="/static/js/comments.js"></script>
+        <script type="text/javascript">
+        var c_user_uid = '[% c.user.uid %]';
+        var c_user_id = '[% c.user.id %]';
+
+        $(document).ready(function() {
+            [%- IF c.user_exists AND c.flash.post_login_ajax_action %]
+            window.location.hash = "#[% c.flash.post_login_ajax_action.type %]_[% c.flash.post_login_ajax_action.id %]";
+            [% IF c.flash.post_login_ajax_action.action == 'comment' %]
+            $("#[% c.flash.post_login_ajax_action.type %]_[% c.flash.post_login_ajax_action.id %] textarea").removeClass('clearme');
+            $("#[% c.flash.post_login_ajax_action.type %]_[% c.flash.post_login_ajax_action.id %] textarea").val("[% c.flash.post_login_ajax_action.data %]");
+            
+            $("#[% c.flash.post_login_ajax_action.type %]_[% c.flash.post_login_ajax_action.id %]").find('.comment_button').trigger('click');
+            console.log($("#[% c.flash.post_login_ajax_action.type %]_[% c.flash.post_login_ajax_action.id %]").find('.comment_button'));
+            [% ELSIF c.flash.post_login_ajax_action.action == 'favorite' %]
+            $("#[% c.flash.post_login_ajax_action.type %]_[% c.flash.post_login_ajax_action.id %]").find('.favorite_button').trigger('click');
+            [%- END %]
+            [%- END %]
+
+        });
+        </script>
+    [% END %]

@@ -1,0 +1,7 @@
+[% WRAPPER wrapper.tt
+   title = 'Non-existent user: ' _ user_name
+%]
+<b>Non-existent user: [% user_name %]</b>
+<br /><br />
+<b>Give feedback <a href="/contact">here</a>.</b>
+[% END %]

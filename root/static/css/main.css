@@ -1,0 +1,311 @@
+body {
+/*    background-image:url('/static/OwlHome/images/stripe_bg.png');
+    background-attachment:fixed; */
+}
+
+img {
+	max-width:100%;
+}
+
+a.external {
+    background: url(/static/images/external.png) center right no-repeat;
+    padding-right: 13px;
+}
+.loading_animation {
+    display:none;
+}
+.icon {
+    font-size:17px;
+    float:right;
+}
+#user_info {
+    float:right;
+}
+.site_stats {
+    text-align:right;
+}
+
+.header {
+    padding-top:8px;
+    background-image:url('/static/images/faded_bg.png');
+    width: 948px;
+    margin: auto;
+    height: 170px;
+    padding: 13px;
+}
+
+.no_focus_input {
+    color:gray;
+}
+.in_focus_input {
+    color:black;
+}
+.pList ul { 
+    list-style:none; 
+    margin-right:27px;
+    float:left;
+}
+
+.pList2 ul { 
+    list-style:none; 
+    margin-right:9px;
+    float:left;
+}
+.pList3 ul { 
+    list-style:none; 
+    margin-right:3px;
+    float:left;
+}
+
+#index h1 {
+    border-bottom:1px solid gray;
+    margin-bottom:14px;
+    padding-bottom:8px;
+    font-size:25px;
+    font-family:Times;
+} 
+#index h2 {
+    font-size:25px;
+    font-family:Times;
+    border-bottom:1px solid gray;
+    margin-bottom:14px;
+    padding-bottom:9px;
+}
+
+#sidebar {
+    position: absolute;
+    left: -142px;
+    top:121px;
+}
+
+.like_dislike {
+    margin-bottom:10px;
+    float:left;
+    width:100px;
+}
+.like_dislike a {
+    color:gray;
+    font-size:11px;
+    text-decoration:none;
+}
+.like_dislike .left {
+    float:left;
+    padding-right:4px;
+
+}
+
+/* Special Stuff for Bubble Pop Ups to play nice with CSS Blueprint */
+.jquerybubblepopup tbody tr:nth-child(even) td, .jquerybubblepopup tbody tr.even td {
+    background: transparent;
+}
+.jquerybubblepopup-innerHtml div {
+    background:white;
+}
+
+.dislike
+{
+    display: block;
+    width: 16px;
+    height: 16px;
+    background: url("/static/images/dislike_sprite.png") no-repeat 0 0;
+}
+
+.dislike a
+{
+    padding-left:20px;
+    padding-right:3px;
+    float:left;
+}
+
+.dislike:hover
+{ 
+    background-position: 0 -16px;
+}
+
+.no_show
+{
+    position: absolute;
+    top: -999em;
+}
+
+
+.like
+{
+    display: block;
+    height: 16px;
+    background: url("/static/images/like_sprite.png") no-repeat 0 0;
+}
+
+.like a
+{
+    padding-left:20px;
+    padding-right:3px;
+    min-width:15px;
+}
+
+.like:hover
+{ 
+    background-position: 0 -16px;
+}
+
+/* favorite */
+
+.favorite {
+    float:left;
+    margin-bottom:10px;
+}
+.favorite a {
+    color:gray;
+    font-size:11px;
+    text-decoration:none;
+}
+.favorite .left {
+    float:left;
+    padding-right:4px;
+
+}
+
+.favorite
+{
+    display: block;
+    width: 144px;
+    height: 18px;
+    background: transparent url(/static/images/favorite.png) 0 -18px no-repeat;
+}
+
+.favorite a
+{
+    padding-left:25px;
+    padding-right:3px;
+    padding-top:2px;
+    float:left;
+}
+.favorite a:hover, .favorite:hover
+{
+    background: transparent url(/static/images/favorite.png) 0 0 no-repeat;
+
+}
+.no_show
+{
+    position: absolute;
+    top: -999em;
+}
+
+
+
+
+/* consistent buttons css */
+
+.buttons {
+    float:right;
+}
+
+.buttons a, .buttons button {
+    display:block;
+    float:left;
+    margin:0 0 0 7px;
+    background-color:#f5f5f5;
+    border:1px solid #dedede;
+    border-top:1px solid #eee;
+    border-left:1px solid #eee;
+
+    font-family:"Lucida Grande", Tahoma, Arial, Verdana, sans-serif;
+    font-size:12px;
+    line-height:130%;
+    text-decoration:none;
+    font-weight:bold;
+    color:#565656;
+    cursor:pointer;
+    padding:5px 10px 6px 7px; /* Links */
+}
+    .buttons button{
+    width:auto;
+    overflow:visible;
+    padding:4px 10px 3px 7px; /* IE6 */
+}
+    .buttons button[type] {
+    padding:5px 10px 5px 7px; /* Firefox */
+    line-height:17px; /* Safari */
+}
+*:first-child+html button[type] {
+    padding:4px 10px 3px 7px; /* IE7 */
+}
+.buttons button img, .buttons a img{
+    margin:0 3px -3px 0 !important;
+    padding:0;
+    border:none;
+    width:16px;
+    height:16px;
+}
+
+/* STANDARD */
+
+button:hover, .buttons a:hover {
+    background-color:#dff4ff;
+    border:1px solid #c2e1ef;
+    color:#336699;
+}
+.buttons a:active {
+    background-color:#6299c5;
+    border:1px solid #6299c5;
+    color:#fff;
+}
+
+/* POSITIVE */
+
+button.positive, .buttons a.positive{
+    color:#529214;
+}
+.buttons a.positive:hover, button.positive:hover {
+    background-color:#E6EFC2;
+    border:1px solid #C6D880;
+    color:#529214;
+}
+.buttons a.positive:active {
+    background-color:#529214;
+    border:1px solid #529214;
+    color:#fff;
+}
+
+/* NEGATIVE */
+
+.buttons a.negative, button.negative{
+    color:#d12f19;
+}
+.buttons a.negative:hover, button.negative:hover {
+    background:#fbe3e4;
+    border:1px solid #fbc2c4;
+    color:#d12f19;
+}
+.buttons a.negative:active {
+    background-color:#d12f19;
+    border:1px solid #d12f19;
+    color:#fff;
+}
+
+/* REGULAR */
+
+button.regular, .buttons a.regular {
+    color:#336699;
+}
+.buttons a.regular:hover, button.regular:hover {
+    background-color:#dff4ff;
+    border:1px solid #c2e1ef;
+    color:#336699;
+}
+.buttons a.regular:active {
+    background-color:#6299c5;
+    border:1px solid #6299c5;
+    color:#fff;
+}
+
+/* error stuff */
+
+.error_box {
+	color:red;
+	border:1px red solid;
+}
+
+.error_text {
+	color:red;
+}

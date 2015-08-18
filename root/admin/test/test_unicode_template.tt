@@ -1,0 +1,20 @@
+[% WRAPPER admin/test/wrapper.tt
+    title = 'Unicode template test'
+%]
+    <p><img src="/static/images/tests/hello_world_russki.png" alt="Привет мир" title="Привет мир"></p>
+    <p>The following text <span style="font-size:80%;">("Hello world" in Russian)</span> should look like the above image:</p>
+    <p>Привет мир</p>
+    <p>
+    Some other text with utf-8 characters:<br />
+    Académie française<br />
+    Then… the evil ellipsis oozed from the shadows.<br />
+    “Microsoft double quotation marks”<br />
+    ‘Microsoft single quotation marks’<br />
+    text—with em dash<br />
+    Microsoft – Breaker of standards<br />
+    single prime: ′<br />
+    </p>
+    <hr />
+    <span style="color: #736161; size: 75%">
+        <a href="http://search.cpan.org/perldoc?Catalyst::Plugin::Unicode::Encoding">Catalyst::Plugin::Unicode::Encoding</a> name method returned: [% c.encoding.name %]
+[% END %]

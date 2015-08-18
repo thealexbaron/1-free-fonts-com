@@ -1,0 +1,29 @@
+[% WRAPPER wrapper.tt %]
+[%- title = BLOCK %]
+Settings
+[% END %]
+
+[% IF c.flash.settings_updated %]
+<div class="success">
+[% c.flash.settings_updated %]
+</div>
+[% END %]
+
+[% UNLESS c.user.account_related %]
+<div class="alert">
+    <b>Warning:</b> You have disabled receiving updates for <i>Account Related Info</i>. You will not receive any important updates directly related to your [% c.config.site_name %] account.
+</div>
+[% END %]
+
+<h1>[% c.user.uid %]'s Settings</h1>
+<hr>
+<h2>Email Settings</h2>
+
+<form method="POST" action="/user/add/settings">
+    <input type="checkbox" name="account_related" value="1" [% IF c.user.account_related %]checked="checked"[%END %] /> <b>Account Related Info<b> <small> Send me information directly related to my account, such as password reset requests, quote submission approvals, etc.</small><br />
+    <input type="checkbox" name="newsletter" value="1" [% IF c.user.newsletter %]checked="checked"[% END %] /> <b>Newsletter<b> <small> Send me newsletters containing exciting new features available for [% c.config.site_name %] users.</small><br />
+    <br />
+    <input type="submit" value="Save Changes">
+</form>
+
+[% END %]

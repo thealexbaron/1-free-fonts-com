@@ -1,0 +1,5 @@
+test_www_mech_encoding.tt
+
+[% FOREACH category IN categories %]
+[% category %]<br />
+[% END %]

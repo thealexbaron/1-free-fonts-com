@@ -1,0 +1,270 @@
+[%- document = c.stash.doc_type -%]
+[%- document_type => {
+        fonts => {
+            singular => 'font',
+            plural => 'fonts',
+        }
+    }
+-%]
+[% WRAPPER new_wrapper.tt %]
+[%- title = BLOCK -%]
+Free [%- IF keyword %] [% keyword %] [%- END %]
+[%- IF c.stash.letter_only %] fonts that start with [% c.stash.letter_only %][% END -%]
+[%- IF category %][% category %] [% END %]
+[%- IF Author %][% Author %] [% END %] Fonts [%- IF keyword OR category %]| Download [%- IF keyword %][% keyword %][% END %]
+[%- IF category -%][% category %] [% END -%] Fonts[% END -%][% UNLESS (pgr.current_page == 1) %]| [ Page [% pgr.current_page %] ][% END %] | [% IF Author %][% pgr.total_entries %] fonts by [% Author %] | [%- c.config.tag_line.fonts.author -%][%- ELSE -%][%- c.config.tag_line.fonts.generic -%][%- END -%]
+[%- END -%]
+
+[%- meta_description = BLOCK %]
+[%- IF c.stash.letter_only %] fonts that start with [% c.stash.letter_only %][% END %]
+[%- pgr.total_entries %] [%- IF keyword %] [% keyword %][% END %] [%- IF Author %] [% Author %] [% END %] [%- IF category %] [% category %] [% END %] fonts - [% IF author_info.bio %][% author_info.bio | html %][%- ELSE -%][% c.config.tag_line.fonts.long -%][%- END -%]
+[%- END -%]
+
+[%- USE mydate = TimeDate -%]
+[%- USE Math -%]
+[%- colors = ['#e39999', '#aecadd', '#dbe5c2', '#e5cdbf', '#cfcfcf'] -%]
+[%- Author = Author.replace('\+',' ') -%]
+
+<h1>Free [%- IF keyword %][% keyword %] Fonts[% END %]
+[%- IF proverb %][% proverb %][% proverb.search('Proverbs') ? '' : ' Proverbs' %][% END %]
+[%- IF category %][% category %] Fonts[% END %]
+[%- IF c.stash.letter_only %] fonts that start with [% c.stash.letter_only %][% END %]
+[%- IF Author AND keyword %]by [% END %][%- IF Author %][% Author %] Fonts [% END %] [% UNLESS (pgr.current_page == 1) %][% END %]</h1>
+
+[% IF (author_detail AND author_info.bio) OR (category_info.description) AND (pgr.current_page == 1) %]
+<div style="float:right; padding-top:8px; padding-bottom:8px;">
+
+    [% INCLUDE addthis.tt %]
+
+</div>
+[% END %]
+
+[% IF author_detail AND author_info.bio AND pgr.current_page == 1 %]
+<hr>
+<!-- <div class="author_detail"> -->
+<div>
+	<h2>Information about [% author_info.first_name %] [% author_info.last_name %] [% author_info.suffix %]</h2>
+	[% IF author_info.image %]
+	<div style="float:left; width:150px; text-align:center; padding-right:12px; "><img src="/static/images/authors/[% author_info.id %].jpg" alt="[% author_info.first_name %] [% author_info.last_name %] [% author_info.suffix %]" style="padding-bottom:4px;" /> <div>[% author_info.first_name %] [% author_info.last_name %] [% author_info.suffix %]</div>
+	</div>
+	[% END %]
+	<p style="float:left;">
+	<div class="author_bio" style="margin-bottom:15px;">	
+
+	[% IF author_info.bio %][% author_info.bio %]<br /><br />[% END %]</p>
+	</div>
+	[%- USE date %]
+	[%- USE pretty_date = date(format = '%B %d, %Y', locale = 'en_US') %]
+
+    [% IF author_info.birth %]<div style="float:left; margin-right:10px;"><b>Date of Birth:</b> [% pretty_date.format(author_info.birth) %]</div><!-- [% author_info.birth %] -->[% END %]
+    [% IF author_info.death AND author_info.death != '0000-00-00 00:00:00' %]<div style="float:left;"><b>Date of Death:</b> [% pretty_date.format(author_info.death) %]</div>[% END %]
+
+</div>
+
+[% END %]
+
+
+[% IF category_info.description AND pgr.current_page == 1 %]
+<hr>
+<!-- <div class="author_detail"> -->
+<div>
+    <!-- <h2>Information about [% category %]</h2> -->
+	[% IF category_info.image %]
+    <div style="float:left; width:150px; text-align:center; padding-right:12px; ">
+        <img src="/static/images/categories/[% category_info.id %].jpg" alt="[% category %]" style="padding-bottom:4px;" /> 
+        <div>[% category %]</div>
+	</div>
+	[% END %]
+	<p style="float:left;">
+	<div class="author_bio" style="margin-bottom:15px;">
+    	[% category_info.description %]<br /><br /></p>
+	</div>
+
+</div>
+<hr>
+[% END %]
+
+
+[% IF (pgr.current_page == 1 || !pgr.current_page) && !keyword %]
+[%- IF no_authors -%]
+<div class="author_results">
+	<h2>Authors - <span style="color:gray;">No Results</span></h2>
+	There were no <i>authors</i> matching your search 
+	[%- IF keyword %]about <b>[% keyword %]</b> [% END %]
+	[%- IF category %]in the topic of <b>[% category %]</b>[% END %]
+	[%- IF Author %]by <i>[% Author %]</i>[% END %].
+</div>
+[% ELSIF show_authors && !keyword %]
+<div class="author_results">
+	<h2>Authors - [% keyword %]</h2>
+	[% IF exact_match %]
+		[% FOREACH item IN exact_match_data %]
+		<div class="author_found_it">Were you trying to find fonts by <b><a href="/fonts/author/[% item.url_first_name %]/[% item.url_last_name %]">[% item.first_name %] [% item.last_name %]</a></b>?</div>
+		[% END %]		
+	[% ELSE %]
+	<table id="author_table">
+	[% USE table(partial_match, cols=5, pad=0) %]
+		[% FOREACH row IN table.rows %]
+		<tr>
+			[% FOREACH item IN row %]
+			<td>
+				[% IF item.image %]<div style="float:left; margin-right:7px;"><a href="/font/[% item.id %]"><img src="/static/images/authors/[% item.id %]-small.jpg" alt="[% item.first_name %] [% item.last_name %]" /></a></div>[% END %]
+				<a href="/fonts/author/[% item.url_first_name %]/[% item.url_last_name %]">[% item.first_name %] [% item.last_name %]</a><br />
+			</td>
+			[% END %]
+		</tr>
+		[% END %]
+	</table>
+	[% END %]
+</div>
+[% END %]
+[% END %]
+
+[%- IF no_results -%]
+	<h2>Fonts - <span style="color:gray;">No Results</span></h2>
+	There were no fonts matching your search 
+	[%- IF keyword %]about <b>[% keyword %]</b> [% END %]
+	[%- IF category %]in the topic of <b>[% category %]</b>[% END %]
+	[%- IF Author %]by <i>[% Author %]</i>[% END %].
+
+[% ELSE %]
+
+<div class="clear">
+
+[%- IF pgr.total_entries -%][% display_total_entries %] free [%- IF keyword %] <b>[% keyword %]</b>[% END %] fonts[%- ELSE -%]Found no results[%- END -%]
+[%- IF c.stash.letter_only %] that start with [% c.stash.letter_only %][% END %]
+[%- IF category %] in the topic of <b>[% category %]</b>[% END %]
+[%- IF Author %] by <i>[% Author %]</i>[% END %]. <br />[ Page [%- pgr.current_page -%] of [%- pgr.last_page -%] ]
+
+[% IF author_info.first_name OR author_info.last_name %]
+<script type="text/javascript">
+
+$(document).ready(function() {
+
+	$('#author_search_form').submit(function() {
+
+		var search_url = $(this).serialize();
+		console.log(search_url);			
+		var seo_url = search_url.replace(/[&=]/g, "/");
+			
+		window.location = ("/" + seo_url);
+
+		return false;
+		});
+});
+
+</script>	  
+
+	<form action="/fonts" method="get" id="author_search_form" style="float:right;width:285px;">	
+		<input type="hidden" name="fonts" value="author">
+		<input type="hidden" name="[% author_info.first_name %]" value="[% author_info.last_name %]">
+		<input type="text" value="Search within [% author_info.first_name %] [% author_info.last_name %]..." class="clearme no_focus_input" name="keyword" style="width:219px;margin-top:0;">
+		<input type="submit" value="Search">
+	</form>
+
+[% END %]
+
+</div>
+
+[% INCLUDE paging.tt %]
+
+[% IF c.stash.paid_fonts.size %]
+<div class="row">
+	[% FOREACH font IN c.stash.paid_fonts %]
+	<div class="col-md-6">
+	<div class="bg-warning" style="padding:10px;">
+	<small class="text-muted">PREMIUM FONT</small>
+	<br>
+	<h3><a href="[% font.buy_url %]">[% font.name %]</a></h3>
+
+	<a href="[% font.buy_url %]"><img src="[% font.image_url %]" alt="[% font.name %]" class="img-rounded"></a>
+	</div>
+	</div>
+	[% END %]
+</div>
+<hr>
+[% END %]
+
+[% FOREACH item IN result_block %]
+
+[% IF loop.index == 4 %]
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- Leaderboard -->
+<ins class="adsbygoogle"
+     style="display:inline-block;width:728px;height:90px"
+     data-ad-client="ca-pub-4026447410222405"
+     data-ad-slot="2915727377"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+<hr>
+[% END %]
+
+[% author = item.author.first_name _ ' ' _ item.author.last_name %]
+
+<div class="document_wrapper document_wrapper[% item.id %]">
+
+	<a href="/font/[% item.id %]">[% item.name %]</a> by <a href="/fonts/author/[% item.author.first_name | replace('\s+', '+') %]/[% item.author.last_name | replace('\s+', '+') %]"><b>[% author %]</b></a>
+
+	<br /><br />
+
+	<a href="/font/[% item.id %]">
+		<img src="/static/fonts/[% item.id %]/[% item.web_name %].png" alt="Free [% document_type.$document.singular FILTER ucfirst %] [% item.name %]" />
+	</a> 
+
+	<br /><br />
+
+	<a href="#myModal" role="button" data-id="[% item.id %]" class="btn btn btn-success pre_download" data-toggle="modal"><span class="glyphicon glyphicon-download-alt"></span> Download [% item.name %] [% document_type.$document.singular FILTER ucfirst %]</a>
+	
+	<br /><br />
+
+	[% IF item.categories.size %]
+		[% FOREACH category IN item.categories %]
+		<a href="/fonts/category/[% category | replace('\s+', '+') FILTER lower %]"><small>[% category %]</small></a> 
+		[% END %]
+	[% END %]
+
+	<br /><br />
+
+	<small>Share this Font:</small> <input type="text" value="[% c.uri_for('/') %]font/[% item.id %]" style="width:240px;" class="auto_select form-control">
+
+	<hr>
+
+</div>
+[% END %]
+
+[% IF pgr.total_entries > pgr.entries_per_page %]
+[% Pagination %]
+[% END %]
+
+[% END %]
+
+[% IF c.stash.paid_fonts.size %]
+<div class="row">
+	[% FOREACH font IN c.stash.paid_fonts %]
+	<div class="col-md-6">
+	<div class="bg-warning" style="padding:10px;">
+	<small class="text-muted">PREMIUM FONT</small>
+	<br>
+	<h3><a href="[% font.buy_url %]">[% font.name %]</a></h3>
+
+	<a href="[% font.buy_url %]"><img src="[% font.image_url %]" alt="[% font.name %]" class="img-rounded"></a>
+	</div>
+	</div>
+	[% END %]
+</div>
+[% END %]
+
+[% INCLUDE paging.tt %]
+
+[% scripts = BLOCK %]
+[% INCLUDE download_modal.tt %]
+<script type="text/javascript" src="/static/search.js"></script>
+<script type="text/javascript">
+var results = [% json_results %];
+</script> 
+[% END %]
+
+[% END %]
+
+

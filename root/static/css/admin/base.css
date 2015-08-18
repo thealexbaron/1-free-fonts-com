@@ -1,0 +1,56 @@
+body {
+    margin: 0px;
+    padding: 0px;
+    font-family: sans;
+    font-weight: normal;
+}
+iframe#content {
+    margin-top:20px;
+    width:100%;
+    height:96%;
+}
+div#admin {
+    position: fixed;
+    left: 0px
+    top: 0px;
+    width: 100%;
+    background: silver;
+}
+div#admin-separator {
+    height: 20px;
+}
+div.admin-hdr-center { text-align: center; }
+div.admin-hdr-left { float:left; margin-left: 5px;}
+div.admin-hdr-right { float:right; margin-right:5px;}
+div.clr-both {
+    clear:both;
+}
+/* regular non-framed admin pages */
+div#maincontent {
+    margin-top: 36px;
+    padding: 4px;
+}
+div#pgheader {
+    width: 100%;
+    margin: 0px auto;
+    margin-bottom: 10px;
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    background: silver;
+    padding: 4px;
+}
+div#pgheader div.hdr-center {
+    text-align: center;
+    margin: 0px auto;
+}
+div#pgheader div.hdr-left {
+    float: left;
+    margin-left: 10px;
+}
+div#pgheader div.hdr-right {
+    float: right;
+    margin-right: 10px;
+}
+

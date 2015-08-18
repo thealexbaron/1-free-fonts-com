@@ -1,0 +1,48 @@
+[% WRAPPER admin/test/wrapper.tt
+    title = 'Unicode &lt;=&gt; DB roundtrip test'
+%]
+<style type="text/css">
+    table th { text-align: left; }
+</style>
+    <form id="myform" method="POST" action="show_unicode_db_roundtrip_result">
+        <label for="mytext">Input accented text:</label>
+        <input type="text" name="mytext" id="mytext"></input>
+        <input type="submit">
+    </form>
+    <hr>
+    <h4>Samples</h4>
+    <table>
+        <tr>
+            <th>String</th>
+            <th>Errors</th>
+        </tr>
+        <tr>
+            <td>Académie française</td>
+            <td>no errors</td>
+        </tr>
+        <tr>
+            <td>Then&#8230; the evil ellipsis oozed from the shadows.</td>
+            <td>no errors</td>
+        </tr>
+        <tr>
+            <td>&#8220;Microsoft double quotation marks&#8221;</td>
+            <td>no errors</td>
+        </tr>
+        <tr>
+            <td>&#8216;Microsoft single quotation marks&#8217;</td>
+            <td>no errors</td>
+        </tr>
+        <tr>
+            <td>text&#8212;with em dash</td>
+            <td>no errors</td>
+        </tr>
+        <tr>
+            <td>Microsoft &#8211; Breaker of standards</td>
+            <td>no errors</td>
+        </tr>
+        <tr>
+            <td>single prime: &#8242;</td>
+            <td>no errors</td>
+        </tr>
+    </table>
+[% END %]

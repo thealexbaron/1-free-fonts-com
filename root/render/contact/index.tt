@@ -1,0 +1,53 @@
+[% WRAPPER new_wrapper.tt %]
+[%- title = BLOCK %]
+[% c.config.site_name %] | Contact
+[% END %]
+
+<h1>Contact [% c.config.site_name %]</h1>
+
+[% IF c.stash.message -%]<div class="alert alert-warning">[% c.stash.message -%]</div>[% END -%]
+
+<form action="/contact/submit" method="post" class="form-horizontal" role="form">
+
+	<div class="form-group">
+		<label for="name" class="col-sm-2 control-label">Name</label>
+		<div class="col-sm-10">
+			<input type="name" class="form-control" name="name" placeholder="Name" value="[% c.req.param('name') %]">
+		</div>
+	</div>
+
+	<div class="form-group">
+		<label for="email" class="col-sm-2 control-label">Email</label>
+		<div class="col-sm-10">
+			<input type="email" class="form-control" name="email" placeholder="Email" value="[% c.req.param('email') %]">
+		</div>
+	</div>
+
+	<div class="form-group">
+		<label for="body" class="col-sm-2 control-label">Comments or Inquiry</label>
+		<div class="col-sm-10">
+			<textarea class="form-control" rows="3" name="body">[% c.req.param('body') %]</textarea>
+		</div>
+	</div>
+
+	<hr>
+
+	<div class="col-sm-offset-2 col-sm-10"><p class="help-block">Please enter the characters in the image below</p></div>
+	<div class="col-sm-offset-2 col-sm-10"><p><img src="/captcha" alt="Secret Code"></p></div>
+
+	<div class="form-group">
+		<label for="captcha" class="col-sm-2 control-label">Captcha</label>
+		<div class="col-sm-10">
+			<input type="text" id="captcha" name="captcha" class="form-control" />
+		</div>
+	</div>  
+	<input type="hidden" name="action" value="validate">
+
+	<div class="form-group">
+		<div class="col-sm-offset-2 col-sm-10">
+			<input class="btn btn-default" type="submit" value="Submit" name="submit">
+		</div>
+	</div>
+</form>
+	
+[% END %]

@@ -1,0 +1,114 @@
+[% WRAPPER new_wrapper.tt %]
+
+[%- document = c.stash.doc_type %]
+[%- document_type => {
+        fonts => {
+            singular => 'font',
+            plural => 'fonts',
+        }
+    }
+%]
+
+[%- author = document_block.author.first_name _ ' ' _ document_block.author.last_name -%]
+
+[%- title = BLOCK %]
+[% document_for_title | truncate(150) %] [% document_type.$document.singular FILTER ucfirst %] - [% author %] | [% c.config.tag_line.fonts.generic %]
+[% END %]
+[%- meta_description = BLOCK %]
+[% document_block.name | truncate(150) %]
+[% END %]
+
+<style type="text/css">
+	.single_document {
+		font-size:20px;
+	}
+	.author_name {
+		margin-top:3px;
+	}
+	.main_block {
+
+		margin-left:15px;
+	}
+
+</style>
+
+<div class="row">
+	<div class="col-md-12">
+		<a href="#myModal" role="button" data-id="[% document_block.id %]" class="btn btn-success pre_download btn-lg" data-toggle="modal"><span class="glyphicon glyphicon-download-alt"></span> Download [% document_block.name %] [% document_type.$document.singular FILTER ucfirst %]</a>
+
+		    [% IF document_block.image %]<div class="left" style="padding-right:10px;"><img src="/static/images/authors/[% document_block.id %].jpg" alt="[% author %]" /></div>[% END %]
+		    <p class="main_block">
+		    <h1 class="single_document">[% document_block.name %] [% document_type.$document.singular FILTER ucfirst %]</h1>
+		    <img src="/static/fonts/[% document_block.id %]/[% document_block.web_name %].png" alt="[% document_type.$document.singular FILTER ucfirst %] Font [% document_block.name %]" /><br />
+		    by [% author %]<br />
+		    </p>
+
+	</div>
+</div>
+
+<hr>
+
+[% IF document_block.bio %]
+<div class="highlight_block">
+	<h2>Additional Information About [% author %]</h2>
+	[% IF document_block.category %]<b>Category:</b> <a href="/[% document_type.$document.plural %]/category/[% Category_URI %]">[% document_block.category %]</a><br />[% END %]
+
+	[%- USE date %]
+	[%- USE pretty_date = date(format => '%B %d, %Y', locale => 'en_GB') %]
+
+	[% IF document_block.birth > 0 %]<b>Date of Birth:</b> [% pretty_date.format(document_block.birth) %]<br />[% END %]
+	[% IF document_block.death > 0 %]<b>Date of Death:</b> [% pretty_date.format(document_block.death) %]<br />[% END %]
+
+</div>
+[% END %]
+
+[% IF popular_documents_count %]
+<div class="row">
+	<div class="col-md-4">
+		<div class="panel panel-default">
+			<!-- Default panel contents -->
+			<div class="panel-heading">Top 5 Most Popular [% document_type.$document.plural FILTER ucfirst %] by [% author %]</div>
+
+			<!-- Table -->
+			<table class="table">
+				<thead>
+					<th>#</th>
+					<th>Font</th>
+				</thead>
+				<tbody>
+				[% FOREACH item IN popular_documents %]
+				<tr>
+					<td>[% loop.index + 1 %]</td>
+					<td><a href="/[% document_type.$document.singular %]/[% item.id %]">[% item.name %]</a></td>
+				</tr>
+				[% END %]
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+[% END %]
+
+<hr>
+
+<div class="highlight_block">
+	<h2>All [% document_type.$document.plural FILTER ucfirst %] by [% author %]</h2>
+	<div style="float:left;margin-right:55px;">
+	[% FOREACH item IN all_documents %]
+		<a href="/[% document_type.$document.singular %]/[% item.id %]">[% item.name | truncate(50) %]</a><br />
+	[% END %]
+	<br />
+	<a href="/[% document_type.$document.plural %]/author/[% url_first_name %]/[% url_last_name %]"><b>View All</b></a> <small>by [% document_block.first_name %] [% document_block.last_name %]</small>
+	</div>
+
+</div>
+
+[% scripts = BLOCK%]
+[% INCLUDE download_modal.tt %]
+<script type="text/javascript" src="/static/search.js"></script>
+<script type="text/javascript">
+var results = [% json_results %];
+</script> 
+[% END %]
+
+[% END %]

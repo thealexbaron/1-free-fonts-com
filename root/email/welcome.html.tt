@@ -1,0 +1,10 @@
+[% c.req.params.firstname %],
+<br /><br />
+Welcome to [% c.config.site_name %], the largest growing quotes community on the internet! Here are some of the features that you now have access to as a member of [% c.config.site_name %]:
+<br /><br />
+<ol>
+    <li>Share your wisdom by submitting your own quotes: <a href="[% c.uri_for('/user/add/quote') %]">Start adding to the userbase now!</a></li>
+    <li>Add quotes to your favorite list. Just look for the star. <img src="[% c.uri_for('/static/images/favorite.png') %]" alt="Favorite Star" /></li>
+    <li>Create a profile with a bio, a picture, all of the quotes that you've submitted, and your favorites list.</li>
+</ol>
+[% INCLUDE email_signature.tt %]
