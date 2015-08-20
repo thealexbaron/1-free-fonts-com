@@ -1,5 +1,7 @@
 #!/usr/bin/env perl
 
+use lib "/home/alexb/1-free-fonts.com/local/lib/perl5";
+
 use Catalyst::ScriptRunner;
 Catalyst::ScriptRunner->run('Harvest', 'FastCGI');
 
