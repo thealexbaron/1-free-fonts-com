@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 
-use lib "/home/alexb/1-free-fonts.com/local/lib/perl5";
+use FindBin;
+use lib "$FindBin::Bin/../local/lib/perl5";
 
 BEGIN {
     $ENV{CATALYST_SCRIPT_GEN} = 40;
