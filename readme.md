@@ -1,9 +1,11 @@
 1-free-fonts.com
 ===============
+
 # these must be run as sudo
 `apt-get install carton`
 `apt-get install libgd-gd2-perl`
 `apt-get install imagemagick --fix-missing`
+`apt-get install perlmagick`
 `apt-get install libgd-dev`
 `apt-get install memcached`
 `apt-get install libcache-memcached-perl`
