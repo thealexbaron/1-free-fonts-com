@@ -97,8 +97,6 @@
 	[% FOREACH item IN all_documents %]
 		<a href="/[% document_type.$document.singular %]/[% item.id %]">[% item.name | truncate(50) %]</a><br />
 	[% END %]
-	<br />
-	<a href="/[% document_type.$document.plural %]/author/[% url_first_name %]/[% url_last_name %]"><b>View All</b></a> <small>by [% document_block.first_name %] [% document_block.last_name %]</small>
 	</div>
 
 </div>
@@ -108,7 +106,7 @@
 <script type="text/javascript" src="/static/search.js"></script>
 <script type="text/javascript">
 var results = [% json_results %];
-</script> 
+</script>
 [% END %]
 
 [% END %]
